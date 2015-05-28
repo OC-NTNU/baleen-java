@@ -54,19 +54,19 @@ public class Transform {
             System.exit(1);
         }
 
-        Path inRecords = Paths.get(namespace.getString("inRecords"));
-        Path outRecords = Paths.get(namespace.getString("outRecords"));
-        List<String> transList = namespace.<String>getList("transforms");
-        Path[] transFilenames = new Path[transList.size()];
-        for (int i=0; i < transList.size(); i++) {
-            transFilenames[i] = Paths.get(transList.get(i));
+        Path inFilename = Paths.get(namespace.getString("inRecords"));
+        Path outFilename = Paths.get(namespace.getString("outRecords"));
+        List<String> transStrings = namespace.<String>getList("transforms");
+        List<Path> transFilenames = new ArrayList<>();
+        for (String trans: transStrings) {
+            transFilenames.add(Paths.get(trans));
         }
 
-        transform(inRecords, outRecords, transFilenames);
+        transform(inFilename, outFilename, transFilenames);
     }
 
 
-    public static void transform(Path inFilename, Path outFilename, Path[] transformFilenames) {
+    public static void transform(Path inFilename, Path outFilename, List<Path> transformFilenames) {
         List<Map<String, Object>> records = readRecords(inFilename);
 
         List<Triple<String, TregexPattern, TsurgeonPattern>> trans;
@@ -188,7 +188,7 @@ public class Transform {
     }
 
 
-    public static List<Triple<String, TregexPattern, TsurgeonPattern>> readTransformations(Path[] filenames ) {
+    public static List<Triple<String, TregexPattern, TsurgeonPattern>> readTransformations(List<Path> filenames ) {
         // use simple data binding instead of full data binding to POJO
         // because the number of fields in the records is unknown
         List<Triple<String, TregexPattern, TsurgeonPattern>> trans = null;

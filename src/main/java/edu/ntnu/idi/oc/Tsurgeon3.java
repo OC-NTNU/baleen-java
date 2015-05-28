@@ -25,7 +25,7 @@ import java.util.List;
 public class Tsurgeon3 {
     // cannot extend Tsurgeon class because it has a private constructor, so delegate
 
-    public static List<Triple<String, TregexPattern, TsurgeonPattern>> getOperationsFromFile(Path[] filenames, Charset encoding, TregexPatternCompiler compiler) throws IOException {
+    public static List<Triple<String, TregexPattern, TsurgeonPattern>> getOperationsFromFile(List<Path> filenames, Charset encoding, TregexPatternCompiler compiler) throws IOException {
         List<Triple<String, TregexPattern, TsurgeonPattern>> ops = new ArrayList<>();
         {
             for (Path filename : filenames) {

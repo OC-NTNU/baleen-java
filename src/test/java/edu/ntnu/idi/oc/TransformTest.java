@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ public class TransformTest {
     private static String resourcesPath = "src/test/resources";
     private static Path inFilename = Paths.get(resourcesPath, "input.json");
     private static Path outFilename = Paths.get(resourcesPath, "output.json");
-    private static Path[] transFilenames = {Paths.get(resourcesPath, "trans.tfm")};
+    private static List<Path> transFilenames = Arrays.asList(Paths.get(resourcesPath, "trans.tfm"));
     private static List<Map<String, Object>> outRecords;
 
     @BeforeClass
