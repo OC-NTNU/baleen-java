@@ -8,16 +8,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
 
 /**
- * Tests of Prune
+ * Tests of Transform
  */
-public class PruneTest {
+public class TransformTest {
 
     private static String resourcesPath = "src/test/resources";
     private static Path inFilename = Paths.get(resourcesPath, "input.json");
@@ -28,8 +27,8 @@ public class PruneTest {
     @BeforeClass
     public static void beforeClass() throws IOException {
         Files.deleteIfExists(outFilename);
-        Prune.transform(inFilename, outFilename, transFilenames);
-        outRecords = Prune.readRecords(outFilename);
+        Transform.transform(inFilename, outFilename, transFilenames);
+        outRecords = Transform.readRecords(outFilename);
     }
 
     @Test

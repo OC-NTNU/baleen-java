@@ -28,13 +28,13 @@ import edu.stanford.nlp.util.Triple;
 
 
 /**
- * Prune subtrees with Tsurgeon operations
+ * Transform subtrees with Tsurgeon operations
  */
-public class Prune {
+public class Transform {
 
     public static void main(String[] args) {
-        ArgumentParser parser = ArgumentParsers.newArgumentParser("Prune")
-                .description("Prune variable trees");
+        ArgumentParser parser = ArgumentParsers.newArgumentParser("Transform")
+                .description("Transform variable trees");
         parser.addArgument("inRecords")
                 .metavar("IN")
                 .help("input file in JSON format");
