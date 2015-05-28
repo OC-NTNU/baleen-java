@@ -1,6 +1,5 @@
 package edu.ntnu.idi.oc;
 
-import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.tregex.TregexMatcher;
 import edu.stanford.nlp.trees.tregex.TregexPattern;
@@ -12,6 +11,9 @@ import edu.stanford.nlp.util.Triple;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,10 +25,10 @@ import java.util.List;
 public class Tsurgeon3 {
     // cannot extend Tsurgeon class because it has a private constructor, so delegate
 
-    public static List<Triple<String, TregexPattern, TsurgeonPattern>> getOperationsFromFile(List<String> filenames, String encoding, TregexPatternCompiler compiler) throws IOException {
+    public static List<Triple<String, TregexPattern, TsurgeonPattern>> getOperationsFromFile(Path[] filenames, Charset encoding, TregexPatternCompiler compiler) throws IOException {
         List<Triple<String, TregexPattern, TsurgeonPattern>> ops = new ArrayList<>();
         {
-            for (String filename : filenames) {
+            for (Path filename : filenames) {
                 List<Triple<String, TregexPattern, TsurgeonPattern>> triples = getOperationsFromFile(filename, encoding, compiler);
                 ops.addAll(triples);
             }
@@ -35,8 +37,9 @@ public class Tsurgeon3 {
     }
 
 
-    public static List<Triple<String, TregexPattern, TsurgeonPattern>> getOperationsFromFile(String filename, String encoding, TregexPatternCompiler compiler) throws IOException {
-        BufferedReader reader = IOUtils.readerFromString(filename, encoding);
+    public static List<Triple<String, TregexPattern, TsurgeonPattern>> getOperationsFromFile(Path filename, Charset encoding, TregexPatternCompiler compiler) throws IOException {
+        // use BufferedReader because Tsurgeon.getTregexPatternFromReader does
+        BufferedReader reader = Files.newBufferedReader(filename, encoding);
         List<Triple<String, TregexPattern,TsurgeonPattern>> operations = getOperationsFromReader(reader, compiler);
         reader.close();
         return operations;

@@ -1,6 +1,9 @@
 package edu.ntnu.idi.oc;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,12 +54,19 @@ public class Prune {
             System.exit(1);
         }
 
-        transform(namespace.getString("inRecords"), namespace.getString("outRecords"),
-                namespace.<String>getList("transforms"));
+        Path inRecords = Paths.get(namespace.getString("inRecords"));
+        Path outRecords = Paths.get(namespace.getString("outRecords"));
+        List<String> transList = namespace.<String>getList("transforms");
+        Path[] transFilenames = new Path[transList.size()];
+        for (int i=0; i < transList.size(); i++) {
+            transFilenames[i] = Paths.get(transList.get(i));
+        }
+
+        transform(inRecords, outRecords, transFilenames);
     }
 
 
-    public static void transform(String inFilename, String outFilename, List<String> transformFilenames) {
+    public static void transform(Path inFilename, Path outFilename, Path[] transformFilenames) {
         List<Map<String, Object>> records = readRecords(inFilename);
 
         List<Triple<String, TregexPattern, TsurgeonPattern>> trans;
@@ -77,8 +87,8 @@ public class Prune {
         // keep on transforming output until nothing changes
         while ((transRecords.size() > 0)) {
             records.addAll(transRecords);
+            newIndex += transRecords.size();
             transRecords = applyTransformationsOnce(transRecords, trans, newIndex);
-            //System.out.println(transRecords.size());
         }
     }
 
@@ -105,7 +115,8 @@ public class Prune {
                     continue;
                 }
 
-                // copy pat_name, label, file, rel_tree_n, node_n, origin and any other fields from ancestor record
+                // copy pat_name, label, file, rel_tree_n, node_n, origin (if it exists) and
+                // any other fields from ancestor record
                 Map<String, Object> newRecord = new HashMap<>(record);
 
                 // now update fields that are differ for descendant
@@ -117,7 +128,13 @@ public class Prune {
                 String substr = PTBTokenizer.ptb2Text(Sentence.listToString(transTree.yield()));
                 newRecord.put("substr", substr);
 
+                if (!newRecord.containsKey("origin")) {
+                    // this is the first transformation, so origin is same as ancestor
+                    newRecord.put("origin",  record.get("index"));
+                }
+
                 // add to descendants of ancestor
+                // cast to list, because "descendants" may have been present in the input
                 List<Integer> descendants = (List<Integer>) record.get("descendants");
                 descendants.add(newIndex);
 
@@ -129,15 +146,12 @@ public class Prune {
 
 
     private static Integer prepareRecords(List<Map<String, Object>> records) {
-        // find max index and add "origin" and "descendants" fields
+        // find max index and add "descendants" fields
         Integer newIndex = 0;
 
         for (Map<String, Object> record: records) {
             Integer index = (Integer) record.get("index");
             newIndex = Math.max(newIndex, index);
-            if (!record.containsKey("origin")) {
-                record.put("origin", index);
-            }
             if (!record.containsKey("descendants")) {
                 record.put("descendants", new ArrayList<Integer>());
             }
@@ -146,13 +160,13 @@ public class Prune {
     }
 
 
-    public static List<Map<String, Object>> readRecords(String fileName)  {
+    public static List<Map<String, Object>> readRecords(Path fileName)  {
         ObjectMapper mapper = new ObjectMapper();
         List<Map<String,Object>> records = null;
 
         try {
             // See http://wiki.fasterxml.com/JacksonInFiveMinutes "Data bindings with generics"
-            records = mapper.readValue(new File(fileName), new TypeReference<List<Map<String,Object>>>() { });
+            records = mapper.readValue(fileName.toFile(), new TypeReference<List<Map<String,Object>>>() { });
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
@@ -161,12 +175,12 @@ public class Prune {
     }
 
 
-    public static void writeRecords(List<Map<String, Object>> records, String fileName) {
+    public static void writeRecords(List<Map<String, Object>> records, Path fileName) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
         try {
-            mapper.writeValue(new File(fileName), records);
+            mapper.writeValue(fileName.toFile(), records);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
@@ -174,13 +188,13 @@ public class Prune {
     }
 
 
-    public static List<Triple<String, TregexPattern, TsurgeonPattern>> readTransformations(List<String> filenames ) {
+    public static List<Triple<String, TregexPattern, TsurgeonPattern>> readTransformations(Path[] filenames ) {
         // use simple data binding instead of full data binding to POJO
         // because the number of fields in the records is unknown
         List<Triple<String, TregexPattern, TsurgeonPattern>> trans = null;
 
         try {
-            trans = Tsurgeon3.getOperationsFromFile(filenames, "UTF-8", new TregexPatternCompiler());
+            trans = Tsurgeon3.getOperationsFromFile(filenames, StandardCharsets.UTF_8, new TregexPatternCompiler());
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
