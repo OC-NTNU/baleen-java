@@ -11,25 +11,26 @@ import edu.stanford.nlp.util.Triple;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Tsurgeon with named operations
+ * Tsurgeon-like class with named operations
  *
  * TODO: write doc
  */
 public class Tsurgeon3 {
     // cannot extend Tsurgeon class because it has a private constructor, so delegate
 
-    public static List<Triple<String, TregexPattern, TsurgeonPattern>> getOperationsFromFile(List<Path> filenames, Charset encoding, TregexPatternCompiler compiler) throws IOException {
+    public static List<Triple<String, TregexPattern, TsurgeonPattern>>
+    getOperationsFromFile(List<Path> filenames) throws IOException {
         List<Triple<String, TregexPattern, TsurgeonPattern>> ops = new ArrayList<>();
         {
             for (Path filename : filenames) {
-                List<Triple<String, TregexPattern, TsurgeonPattern>> triples = getOperationsFromFile(filename, encoding, compiler);
+                List<Triple<String, TregexPattern, TsurgeonPattern>> triples = getOperationsFromFile(filename);
                 ops.addAll(triples);
             }
         }
@@ -37,19 +38,22 @@ public class Tsurgeon3 {
     }
 
 
-    public static List<Triple<String, TregexPattern, TsurgeonPattern>> getOperationsFromFile(Path filename, Charset encoding, TregexPatternCompiler compiler) throws IOException {
+    public static List<Triple<String, TregexPattern, TsurgeonPattern>>
+    getOperationsFromFile(Path filename) throws IOException {
+        List<Triple<String, TregexPattern, TsurgeonPattern>> operations;
         // use BufferedReader because Tsurgeon.getTregexPatternFromReader does
-        BufferedReader reader = Files.newBufferedReader(filename, encoding);
-        List<Triple<String, TregexPattern,TsurgeonPattern>> operations = getOperationsFromReader(reader, compiler);
-        reader.close();
+        try (BufferedReader reader = Files.newBufferedReader(filename, StandardCharsets.UTF_8)) {
+             operations = getOperationsFromReader(reader);
+        }
         return operations;
     }
 
 
-    public static List<Triple<String, TregexPattern, TsurgeonPattern>> getOperationsFromReader(BufferedReader reader, TregexPatternCompiler compiler) throws IOException {
-        List<Triple<String, TregexPattern,TsurgeonPattern>> operations = new ArrayList<>();
-        for ( ; ; ) {
-            Triple<String, TregexPattern, TsurgeonPattern> operation = getOperationFromReader(reader, compiler);
+    public static List<Triple<String, TregexPattern, TsurgeonPattern>>
+    getOperationsFromReader(BufferedReader reader) throws IOException {
+        List<Triple<String, TregexPattern, TsurgeonPattern>> operations = new ArrayList<>();
+        for (; ; ) {
+            Triple<String, TregexPattern, TsurgeonPattern> operation = getOperationFromReader(reader);
             if (operation == null) {
                 break;
             }
@@ -59,35 +63,48 @@ public class Tsurgeon3 {
     }
 
 
-    public static Triple<String, TregexPattern, TsurgeonPattern> getOperationFromReader(BufferedReader reader, TregexPatternCompiler compiler) throws IOException {
-        String opName = getNameFromReader(reader);
+    public static Triple<String, TregexPattern, TsurgeonPattern>
+    getOperationFromReader(BufferedReader reader) throws IOException {
+        // get name of transformation
+        String transName = getNameFromReader(reader);
+
+        // get compiled pattern for matching
         String patternString = Tsurgeon.getTregexPatternFromReader(reader);
         // System.err.println("Read tregex pattern: " + patternString);
         if (patternString != null && patternString.isEmpty()) {
             return null;
         }
+        TregexPatternCompiler compiler = new TregexPatternCompiler();
         TregexPattern matchPattern = compiler.compile(patternString);
 
+        // get compiled operations
         TsurgeonPattern collectedPattern = Tsurgeon.getTsurgeonOperationsFromReader(reader);
-        return new Triple<>(opName, matchPattern,collectedPattern);
+
+        return new Triple<>(transName, matchPattern,collectedPattern);
     }
 
-
-    public static String getNameFromReader(BufferedReader reader) throws IOException {
+    public static String
+    getNameFromReader(BufferedReader reader) throws IOException {
         // abusing method to read Tregex pattern
         String name = Tsurgeon.getTregexPatternFromReader(reader);
         name = name.replaceAll("\\W*\\$\\W*", "");
         return name;
     }
 
-    public static Tree processPattern(TregexPattern matchPattern, TsurgeonPattern p, Tree t) {
+    public static Tree
+    processPattern(TregexPattern matchPattern,
+                   TsurgeonPattern p,
+                   Tree t) {
         return Tsurgeon.processPattern(matchPattern, p, t);
     }
 
     /**
      * New method that applies the pattern just once, whereas processPattern applies it exhaustively.
      */
-    public static Tree processPatternOnce(TregexPattern matchPattern, TsurgeonPattern p, Tree t) {
+    public static Tree
+    processPatternOnce(TregexPattern matchPattern,
+                       TsurgeonPattern p,
+                       Tree t) {
         TregexMatcher m = matchPattern.matcher(t);
         TsurgeonMatcher tsm = p.matcher();
         if (m.find()) {
