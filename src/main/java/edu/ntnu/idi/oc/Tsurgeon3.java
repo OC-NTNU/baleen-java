@@ -23,7 +23,7 @@ import java.util.List;
  * TODO: write doc
  */
 public class Tsurgeon3 {
-    // cannot extend Tsurgeon class because it has a private constructor, so delegate
+    // cannot extend Tsurgeon class because it has a private constructor and static methods, so delegate
 
     public static List<Triple<String, TregexPattern, TsurgeonPattern>>
     getOperationsFromFile(List<Path> filenames) throws IOException {

@@ -1,7 +1,6 @@
 package edu.ntnu.idi.oc;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -22,7 +21,6 @@ import edu.stanford.nlp.ling.Sentence;
 import edu.stanford.nlp.process.PTBTokenizer;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.tregex.TregexPattern;
-import edu.stanford.nlp.trees.tregex.TregexPatternCompiler;
 import edu.stanford.nlp.trees.tregex.tsurgeon.TsurgeonPattern;
 import edu.stanford.nlp.util.Triple;
 
@@ -66,7 +64,10 @@ public class Transform {
     }
 
 
-    public static void transform(Path inFilename, Path outFilename, List<Path> transformFilenames) {
+    public static void
+    transform(Path inFilename,
+              Path outFilename,
+              List<Path> transformFilenames) {
         List<Map<String, Object>> records = readRecords(inFilename);
 
         List<Triple<String, TregexPattern, TsurgeonPattern>> trans;
@@ -78,8 +79,11 @@ public class Transform {
     }
 
 
-    public static void applyTransformationsExhaustively(List<Map<String, Object>> records,
-                                                        List<Triple<String, TregexPattern, TsurgeonPattern>> trans) {
+    public static void
+    applyTransformationsExhaustively(List<Map<String, Object>> records,
+                                     List<Triple<String,
+                                             TregexPattern,
+                                             TsurgeonPattern>> trans) {
         Integer newIndex = prepareRecords(records);
         List<Map<String, Object>> transRecords = applyTransformationsOnce(records, trans, newIndex);
         //System.out.println(transRecords.size());
@@ -93,7 +97,10 @@ public class Transform {
     }
 
 
-    private static List<Map<String, Object>> applyTransformationsOnce(List<Map<String, Object>> records, List<Triple<String, TregexPattern, TsurgeonPattern>> trans, Integer newIndex) {
+    private static List<Map<String, Object>>
+    applyTransformationsOnce(List<Map<String, Object>> records,
+                             List<Triple<String, TregexPattern,
+                                     TsurgeonPattern>> trans, Integer newIndex) {
         List<Map<String, Object>> transRecords = new ArrayList<>();
 
         for (Object obj: records) {
@@ -145,7 +152,8 @@ public class Transform {
     }
 
 
-    private static Integer prepareRecords(List<Map<String, Object>> records) {
+    private static Integer
+    prepareRecords(List<Map<String, Object>> records) {
         // find max index and add "descendants" fields
         Integer newIndex = 0;
 
@@ -160,7 +168,8 @@ public class Transform {
     }
 
 
-    public static List<Map<String, Object>> readRecords(Path fileName)  {
+    public static List<Map<String, Object>>
+    readRecords(Path fileName)  {
         ObjectMapper mapper = new ObjectMapper();
         List<Map<String,Object>> records = null;
 
@@ -175,7 +184,9 @@ public class Transform {
     }
 
 
-    public static void writeRecords(List<Map<String, Object>> records, Path fileName) {
+    public static void
+    writeRecords(List<Map<String, Object>> records,
+                 Path fileName) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
@@ -188,13 +199,14 @@ public class Transform {
     }
 
 
-    public static List<Triple<String, TregexPattern, TsurgeonPattern>> readTransformations(List<Path> filenames ) {
+    public static List<Triple<String, TregexPattern, TsurgeonPattern>>
+    readTransformations(List<Path> filenames ) {
         // use simple data binding instead of full data binding to POJO
         // because the number of fields in the records is unknown
         List<Triple<String, TregexPattern, TsurgeonPattern>> trans = null;
 
         try {
-            trans = Tsurgeon3.getOperationsFromFile(filenames, StandardCharsets.UTF_8, new TregexPatternCompiler());
+            trans = Tsurgeon3.getOperationsFromFile(filenames);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
