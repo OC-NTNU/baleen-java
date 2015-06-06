@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -109,8 +109,8 @@ public class Transformation {
 
                 transformTree(ancestorNode);
 
+                // postponed writing of ancestor, because all its descendants need to added
                 mapper.writeValue(generator, ancestorNode);
-
             }
 
             generator.writeEndArray();
@@ -137,7 +137,7 @@ public class Transformation {
 
         for (TreeTransformer transformer: transformers) {
             for (Transform transform: transformer.transformTree(tree)) {
-                descendantNode = ancestorNode.deepCopy().remove(Arrays.asList("descendants"));
+                descendantNode = ancestorNode.deepCopy().remove(Collections.singletonList("descendants"));
                 key = ancestorNode.get("key").asText() + ":" + transform.operationName;
                 ancestorNode.withArray("descendants").add(key);
 
@@ -153,85 +153,6 @@ public class Transformation {
                 mapper.writeValue(generator, descendantNode);
             }
         }
-
     }
-
-
-
-
-//    public static void
-//    applyTransformationsExhaustively(List<Map<String, Object>> records,
-//                                     List<Triple<String,
-//                                             TregexPattern,
-//                                             TsurgeonPattern>> trans) {
-//        Integer newIndex = prepareRecords(records);
-//        List<Map<String, Object>> transRecords = applyTransformationsOnce(records, trans, newIndex);
-//        //System.out.println(transRecords.size());
-//
-//        // keep on transforming output until nothing changes
-//        while ((transRecords.size() > 0)) {
-//            records.addAll(transRecords);
-//            newIndex += transRecords.size();
-//            transRecords = applyTransformationsOnce(transRecords, trans, newIndex);
-//        }
-
-
- /*   private static List<Map<String, Object>>
-    applyTransformationsOnce(List<Map<String, Object>> records,
-                             List<Triple<String, TregexPattern,
-                                     TsurgeonPattern>> trans, Integer newIndex) {
-        List<Map<String, Object>> transRecords = new ArrayList<>();
-
-        for (Object obj: records) {
-            Map record = (Map) obj;
-            String lbs = (String) record.get("subtree");
-            Tree orgTree = Tree.valueOf(lbs);
-
-            if (orgTree == null) {
-                continue;
-            }
-
-            for (Triple triple: trans) {
-                TregexPattern tregexPat = (TregexPattern) triple.second;
-                TsurgeonPattern tsurgeonPat = (TsurgeonPattern) triple.third;
-                Tree tree = orgTree.deepCopy();
-                Tree transTree = Transformer.processPatternOnce(tregexPat, tsurgeonPat, tree);
-
-                if (transTree.equals(orgTree)) {
-                    continue;
-                }
-
-                // copy pat_name, label, file, rel_tree_n, node_n, origin (if it exists) and
-                // any other fields from ancestor record
-                Map<String, Object> newRecord = new HashMap<>(record);
-
-                // now update fields that are differ for descendant
-                newRecord.put("trans_name", triple.first);
-                newRecord.put("index", ++newIndex);
-                newRecord.put("ancestor", record.get("index"));
-                newRecord.put("descendants", new ArrayList<Integer>());
-                newRecord.put("subtree", transTree.toString());
-                String substr = PTBTokenizer.ptb2Text(Sentence.listToString(transTree.yield()));
-                newRecord.put("substr", substr);
-
-                if (!newRecord.containsKey("origin")) {
-                    // this is the first transformation, so origin is same as ancestor
-                    newRecord.put("origin",  record.get("index"));
-                }
-
-                // add to descendants of ancestor
-                // cast to list, because "descendants" may have been present in the input
-                List<Integer> descendants = (List<Integer>) record.get("descendants");
-                descendants.add(newIndex);
-
-                transRecords.add(newRecord);
-            }
-        }
-        return transRecords;
-    }
-*/
-
-
-
 
 }
