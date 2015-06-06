@@ -1,4 +1,4 @@
-package edu.ntnu.idi.oc;
+package edu.ntnu.idi.oc.trees;
 
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.tregex.TregexMatcher;

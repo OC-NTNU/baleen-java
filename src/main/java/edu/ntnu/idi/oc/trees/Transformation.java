@@ -1,4 +1,4 @@
-package edu.ntnu.idi.oc;
+package edu.ntnu.idi.oc.trees;
 
 import java.io.*;
 import java.nio.file.Files;

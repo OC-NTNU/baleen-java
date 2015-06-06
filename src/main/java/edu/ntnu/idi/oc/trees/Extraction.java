@@ -1,4 +1,4 @@
-package edu.ntnu.idi.oc;
+package edu.ntnu.idi.oc.trees;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -31,7 +31,7 @@ public class Extraction {
     private JsonGenerator generator;
 
 
-    private static Logger log = Logger.getLogger("edu.ntnu.idi.oc.Extraction");
+    private static Logger log = Logger.getLogger("Extraction");
 
     public static void main(String[] args) throws IOException {
         ArgumentParser parser = ArgumentParsers.newArgumentParser("Extraction")
