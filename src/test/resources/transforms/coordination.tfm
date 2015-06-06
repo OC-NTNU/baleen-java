@@ -1,0 +1,401 @@
+%*****************************************************************************
+%
+%    COORDINATION
+%
+%*****************************************************************************
+
+% General comments:
+% 
+% Coordinations in the context of "between" can not be pruned, E.g.
+% - "correlations between growth and temperature"
+% - "a small fraction between -4% and +14%" 
+% - "exchange of carbon between ocean and atmosphere"
+
+%=============================================================================
+% Coordination stripping
+%=============================================================================
+
+% Stripping certain parts of coordinations allows subsequent coordination 
+% patterns to match.
+
+%-----------------------------------------------------------------------------
+$ Coordination Strip Init CC $
+%-----------------------------------------------------------------------------
+
+% Strip conjunction at start of coordination.
+
+% Examples:
+%
+% both the timing and magnitude of the warming
+%     === Coordination Strip Init CC ===>
+%         the timing and magnitude of the warming
+         
+         
+__ <1 (CC=cc $.. CC) $.. __
+
+delete cc
+
+%-----------------------------------------------------------------------------
+$ Coordination Strip Init DT $
+%-----------------------------------------------------------------------------
+
+% Strip determiner at start of coordination. 
+
+% Examples:
+%
+% the local population numbers and distribution
+%      === Strip Coordination DT ===>
+%          local population numbers and distribution
+%         
+% the complexity and structure of microbial communities
+%      === Strip Coordination DT ===>
+%          complexity and structure of microbial communities
+%              === Coordination 2.1 ===>
+%                  complexity of microbial communities
+%              === Coordination 2.2 ===>
+%                  structure of microbial communities         
+
+__ <1 DT=dt <CC
+
+delete dt
+
+%-----------------------------------------------------------------------------
+$ Coordination Strip Init CONJP $
+%-----------------------------------------------------------------------------
+
+% Strip conjunction at start of coordination.
+
+% "Not only X but also Y"
+% "Not just X but Y"
+         
+CONJP=conjp >1 __ $.. CC|CONJP
+
+delete conjp
+
+%=============================================================================
+% Coordination 2
+%=============================================================================
+
+% In coordinations with two conjuncts, keep one conjunct but delete other
+% conjuncts, punctuation and conjunction.
+% Also covers cases of coordinated premodifiers
+
+% Examples:
+%
+% temperature and precipitation
+%     === Coordination 2.1 ===>
+%         temperature
+%     === Coordination 2.2 ===>
+%         precipitation
+%
+% nutrient and carbon cycling
+%     === Coordination 2.1 ===>
+%         nutrient cycling
+%     === Coordination 2.2 ===>
+%         carbon cycling
+
+%-----------------------------------------------------------------------------
+$ Coordination 2.1 $
+%-----------------------------------------------------------------------------
+
+__ <1 __=conj1 
+   <2 CC=cc 
+   <3 __=conj2
+   !> (PP <<# between)
+
+delete cc conj2
+
+%-----------------------------------------------------------------------------     
+$ Coordination 2.2 $ 
+%-----------------------------------------------------------------------------
+
+__ <1 __=conj1 
+   <2 CC=cc 
+   <3 __=conj2
+   !> (PP <<# between)
+
+delete conj1 cc
+ 
+
+%=============================================================================
+% Coordination 3
+%=============================================================================
+
+% In coordinations with 3 conjuncts, keep one conjunct but delete other
+% conjuncts, punctuation and conjunction.
+
+% Example:
+% 
+% the yields of maize , rice and wheat
+%     === Coordination 3.1 ===>
+%         the yields of maize
+%     === Coordination 3.2 ===>
+%         the yields of rice
+%     === Coordination 3.3 ===>
+%         the yields of wheat
+
+%-----------------------------------------------------------------------------
+$ Coordination 3.1 $  
+%-----------------------------------------------------------------------------
+
+__ <1 __=conj1 
+   <2 /^,/=punc1 
+   <3 __=conj2 
+   <4 CC=cc 
+   <5 __=conj3
+   !> (PP <<# between)
+
+delete punc1 conj2 cc conj3
+
+%-----------------------------------------------------------------------------     
+$ Coordination 3.2 $  
+%-----------------------------------------------------------------------------
+
+__ <1 __=conj1 
+   <2 /^,/=punc1 
+   <3 __=conj2 
+   <4 CC=cc 
+   <5 __=conj3
+   !> (PP <<# between)  
+
+delete conj1 punc1 cc conj3
+
+%-----------------------------------------------------------------------------
+$ Coordination 3.3 $  
+%-----------------------------------------------------------------------------
+
+__ <1 __=conj1 
+   <2 /^,/=punc1 
+   <3 __=conj2 
+   <4 CC=cc 
+   <5 __=conj3
+   !> (PP <<# between)  
+
+delete conj1 punc1 conj2 cc
+
+
+%=============================================================================
+% Coordination 4
+%=============================================================================
+
+% In coordinations with 4 conjuncts, keep one conjunct but delete other
+% conjuncts, punctuation and conjunction.
+
+% Example:
+%
+% the climate , nutrient inputs , sediment delivery and subsidence rates
+%     === Coordination 4.1 ===>
+%         the climate
+%     === Coordination 4.2 ===>
+%         nutrient inputs
+%     === Coordination 4.3 ===>
+%         sediment delivery
+%     === Coordination 4.4 ===>
+%         subsidence rates
+
+%-----------------------------------------------------------------------------
+$ Coordination 4.1 $  
+%-----------------------------------------------------------------------------
+
+__ <1 __=conj1 
+   <2 /^,/=punc1 
+   <3 __=conj2 
+   <4 /^,/=punc2   
+   <5 __=conj3
+   <6 CC=cc 
+   <7 __=conj4
+   !> (PP <<# between)
+
+delete punc1 conj2 punc2 conj3 cc conj4
+
+%-----------------------------------------------------------------------------
+$ Coordination 4.2 $ 
+%-----------------------------------------------------------------------------
+
+__ <1 __=conj1 
+   <2 /^,/=punc1 
+   <3 __=conj2 
+   <4 /^,/=punc2   
+   <5 __=conj3
+   <6 CC=cc 
+   <7 __=conj4
+   !> (PP <<# between)
+
+delete conj1 punc1 punc2 conj3 cc conj4
+
+%-----------------------------------------------------------------------------
+$ Coordination 4.3 $  
+%-----------------------------------------------------------------------------
+
+__ <1 __=conj1 
+   <2 /^,/=punc1 
+   <3 __=conj2 
+   <4 /^,/=punc2   
+   <5 __=conj3
+   <6 CC=cc 
+   <7 __=conj4
+   !> (PP <<# between)
+
+delete conj1 punc1 conj2 punc2 cc conj4
+
+%-----------------------------------------------------------------------------
+$ Coordination 4.4 $  
+%-----------------------------------------------------------------------------
+
+__ <1 __=conj1 
+   <2 /^,/=punc1 
+   <3 __=conj2 
+   <4 /^,/=punc2   
+   <5 __=conj3
+   <6 CC=cc 
+   <7 __=conj4
+   !> (PP <<# between)
+
+delete conj1 punc1 conj2 punc2 conj3 cc
+      
+
+
+%=============================================================================
+% Coordination Ellipsis
+%=============================================================================
+
+% Examples:
+%
+% terrestrial geochemistry and biology
+%     === Coordination Ellipsis 2.1 ===>
+%          terrestrial geochemistry
+%      === Coordination Ellipsis 2.2 ===>
+%          terrestrial biology
+%         
+% hailstorm frequency and intensity
+%      === Coordination Ellipsis 2.1 ===>
+%          hailstorm frequency
+%      === Coordination Ellipsis 2.2 ===>
+%         hailstorm intensity
+%         
+% the Earth 's rotation and shape
+%      === Coordination Ellipsis 2.1 ===>
+%          the Earth 's rotation
+%      === Coordination Ellipsis 2.2 ===>
+%          the Earth 's shape
+
+%-----------------------------------------------------------------------------
+$ Coordination Ellipsis 2.1 $  
+%-----------------------------------------------------------------------------
+
+__ <-4 !CC|DT 
+   <-3 __=cat 
+   <-2 CC=cc 
+   <-1 !~cat=cat2 
+   !< /^,/
+   
+delete cc cat2
+
+%-----------------------------------------------------------------------------
+$ Coordination Ellipsis 2.2 $  
+%-----------------------------------------------------------------------------
+
+__ <-4 !CC|DT 
+   <-3 __=cat 
+   <-2 CC=cc 
+   <-1 !~cat 
+   !< /^,/
+   
+delete cat cc
+
+
+%=============================================================================
+% Coordination with CONJP
+%=============================================================================
+
+%-----------------------------------------------------------------------------
+$ Coordination CONJP 2.1a $
+%-----------------------------------------------------------------------------
+
+% "X, as well as Y"
+% "X, in addition to Y"
+% "X, but also Y"
+% With punctuation before CONJP
+
+% Examples:
+%
+%  atmospheric greenhouse-gas concentrations , as well as the rate of ocean heat uptake
+%     === Coordination CONJP 2.1a ===>
+%         atmospheric greenhouse-gas concentrations
+%     === Coordination CONJP 2.2a ===>
+%        the rate of ocean heat uptake
+
+/.+P$/=conj1 $+ (/^\W+/=punc $+ ((CONJP=conjp !<< rather|not ) 
+                                             $+ /.+P$/=conj2))
+   
+delete punc conjp conj2 
+
+%-----------------------------------------------------------------------------
+$ Coordination CONJP 2.1b $
+%-----------------------------------------------------------------------------
+
+% "X as well as Y"
+% X in additon to Y""
+% "X but also Y"
+% Without punctuation before CONJP
+
+% Examples:
+%
+%  the spacing between ice wedges as well as their fracture frequency
+%      === Coordination CONJP 2.1a ===>
+%          the spacing between ice wedges
+%      === Coordination CONJP 2.2b ===>
+%          their fracture frequency
+
+/.+P$/=conj1 $+ ((CONJP=conjp !<< rather|not ) 
+                              $+ /.+P$/=conj2)
+   
+delete conjp conj2
+
+%-----------------------------------------------------------------------------
+$ Coordination CONJP 2.1c $
+%-----------------------------------------------------------------------------
+
+% "X, rather than Y"
+% "X, but not Y"
+%
+% Retain X, discard Y.
+% Punctuation before CONJP is virtually always present. 
+
+% Examples:
+%
+%  leaf element concentrations , but not element ratios
+%      === Coordination CONJP 2.1c ===>
+%          leaf element concentrations
+%
+%  the density of trap states , rather than controlling energetic relaxation of hot carriers within the density of states
+%      === Coordination CONJP 2.1c ===>
+%          the density of trap states
+
+/.+P$/=conj1 $+ (/^\W+/=punc $+ ((CONJP=conjp << rather|not ) 
+                                             $+ /.+P$/=conj2))
+   
+delete punc conjp conj2 
+
+%-----------------------------------------------------------------------------
+$ Coordination CONJP 2.2a $
+%-----------------------------------------------------------------------------
+
+% With punctuation before CONJP
+
+/.+P$/=conj1 $+ (/^\W+/=punc $+ ((CONJP=conjp !<< rather|not ) 
+                                             $+ /.+P$/=conj2))
+   
+delete conj1 punc conjp 
+
+%-----------------------------------------------------------------------------
+$ Coordination CONJP 2.2b $
+%-----------------------------------------------------------------------------
+
+% Without punctuation before CONJP
+
+/.+P$/=conj1 $+ ((CONJP=conjp !<< rather|not ) 
+                              $+ /.+P$/=conj2)
+   
+delete conj1 conjp
+
