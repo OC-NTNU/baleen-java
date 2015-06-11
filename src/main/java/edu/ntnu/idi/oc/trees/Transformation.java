@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,8 +32,6 @@ import edu.stanford.nlp.process.PTBTokenizer;
  */
 public class Transformation {
     private final List<TreeTransformer> transformers;
-    private final ObjectMapper mapper = new ObjectMapper();
-    private JsonGenerator generator;
 
 
     public static void main(String[] args) {
@@ -90,11 +89,13 @@ public class Transformation {
                 BufferedReader reader = Files.newBufferedReader(inFilename);
                 BufferedWriter writer = Files.newBufferedWriter(outFilename)
         ) {
+            ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             JsonFactory factory = mapper.getFactory();
             JsonParser parser = factory.createParser(reader);
-            generator = factory.createGenerator(writer);
+            JsonGenerator generator = factory.createGenerator(writer);
             ObjectNode ancestorNode;
+            List<ObjectNode> descendants = new ArrayList<>(100);
 
             if(parser.nextToken() != JsonToken.START_ARRAY) {
                 throw new IllegalStateException("Expected an array at start of Json file " + inFilename);
@@ -106,15 +107,17 @@ public class Transformation {
                 // read everything from this START_OBJECT to the matching END_OBJECT
                 // and return it as a tree model ObjectNode
                 ancestorNode = mapper.readTree(parser);
-
-                transformTree(ancestorNode);
-
+                descendants.clear();
+                transformTree(ancestorNode, descendants);
                 // postponed writing of ancestor, because all its descendants need to added
                 mapper.writeValue(generator, ancestorNode);
+
+                for (ObjectNode descendantNode: descendants) {
+                    mapper.writeValue(generator, descendantNode);
+                }
             }
 
             generator.writeEndArray();
-
             parser.close();
             generator.close();
 
@@ -124,7 +127,7 @@ public class Transformation {
         }
     }
 
-    public void transformTree(ObjectNode ancestorNode) throws IOException{
+    public void transformTree(ObjectNode ancestorNode, List<ObjectNode> descendants) throws IOException{
         Tree tree = Tree.valueOf(ancestorNode.get("subTree").asText());
         ObjectNode descendantNode;
         String key, origin, subStr;
@@ -149,8 +152,8 @@ public class Transformation {
                 subStr = PTBTokenizer.ptb2Text(Sentence.listToString(transform.subTree.yield()));
                 descendantNode.put("subStr", subStr);
 
-                transformTree(descendantNode);
-                mapper.writeValue(generator, descendantNode);
+                descendants.add(descendantNode);
+                transformTree(descendantNode, descendants);
             }
         }
     }

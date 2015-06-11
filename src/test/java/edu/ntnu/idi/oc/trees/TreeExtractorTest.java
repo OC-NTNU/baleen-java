@@ -16,7 +16,7 @@ public class TreeExtractorTest {
 
     @Test
     public void testExtractOne() throws Exception {
-        Tree tree = Tree.valueOf("(S (NP (JJ blue) (N bird)) (V sings))");
+        Tree tree = Tree.valueOf("(S (NP (JJ blue) (NN bird)) (V sings))");
         TregexPattern pattern = TregexPattern.compile("NP < JJ=d1");
         TsurgeonPattern action = Tsurgeon.parseOperation("delete d1");
 
@@ -28,12 +28,12 @@ public class TreeExtractorTest {
 
         assertEquals(1, extracts.size());
         assertEquals(2, extracts.get(0).nodeNumber);
-        assertEquals(Tree.valueOf("(NP (N bird))"), extracts.get(0).subTree);
+        assertEquals(Tree.valueOf("(NP (NN bird))"), extracts.get(0).subTree);
     }
 
     @Test
     public void testExtractTwo() throws Exception {
-        Tree tree = Tree.valueOf("(NP (NP (JJ blue) (N car)) (CONJ and) (NP (JJ red) (N cycle)))");
+        Tree tree = Tree.valueOf("(NP (NP (JJ blue) (NN car)) (CONJ and) (NP (JJ red) (NN cycle)))");
         TregexPattern pattern = TregexPattern.compile("NP < JJ=d1");
         TsurgeonPattern action = Tsurgeon.parseOperation("delete d1");
 
@@ -47,15 +47,15 @@ public class TreeExtractorTest {
         assertEquals(2, extracts.size());
 
         assertEquals(2, extracts.get(0).nodeNumber);
-        assertEquals(Tree.valueOf("(NP (N car))"), extracts.get(0).subTree);
+        assertEquals(Tree.valueOf("(NP (NN car))"), extracts.get(0).subTree);
 
         assertEquals(9, extracts.get(1).nodeNumber);
-        assertEquals(Tree.valueOf("(NP (N cycle))"), extracts.get(1).subTree);
+        assertEquals(Tree.valueOf("(NP (NN cycle))"), extracts.get(1).subTree);
     }
 
     @Test
     public void testExtractEmbedded() throws Exception {
-        Tree tree = Tree.valueOf("(S (NP (JJ blue) (N bird) (PP (P with) (NP (JJ black) (N eyes)))) (V sings))");
+        Tree tree = Tree.valueOf("(S (NP (JJ blue) (NN bird) (PP (P with) (NP (JJ black) (NN eyes)))) (V sings))");
         TregexPattern pattern = TregexPattern.compile("NP < JJ=d1");
         TsurgeonPattern action = Tsurgeon.parseOperation("delete d1");
 
@@ -68,10 +68,10 @@ public class TreeExtractorTest {
         assertEquals(2, extracts.size());
 
         assertEquals(2, extracts.get(0).nodeNumber);
-        assertEquals(Tree.valueOf("(NP (N bird) (PP (P with) (NP (JJ black) (N eyes))))"),
+        assertEquals(Tree.valueOf("(NP (NN bird) (PP (P with) (NP (JJ black) (NN eyes))))"),
                 extracts.get(0).subTree);
 
         assertEquals(10, extracts.get(1).nodeNumber);
-        assertEquals(Tree.valueOf("(NP (N eyes))"), extracts.get(1).subTree);
+        assertEquals(Tree.valueOf("(NP (NN eyes))"), extracts.get(1).subTree);
     }
 }

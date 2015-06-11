@@ -8,9 +8,10 @@ import edu.stanford.nlp.trees.tregex.tsurgeon.TsurgeonPattern;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,29 +20,66 @@ import java.util.List;
  * A tree operation is a named pair of pattern and action.
  */
 public abstract class TreeOperator {
-    private final List<TreeOperation> operations;
+    private final LinkedHashMap<String, TreeOperation> operations;
 
+    public TreeOperator() {
+        operations = new LinkedHashMap<>();
+    }
 
     public TreeOperator(List<TreeOperation> operations) {
-        this.operations = operations;
+        this();
+        setOperationsFromList(operations);
     }
 
     public TreeOperator(Path filename) {
-        operations = getOperationsFromFile(filename);
+        this();
+        setOperationsFromList(readOperations(filename));
     }
 
-    public List<TreeOperation> getOperations() {
+    public TreeOperator(BufferedReader reader) {
+        this();
+        setOperationsFromList(readOperations(reader));
+    }
+
+    private void setOperationsFromList(List<TreeOperation> operations) {
+        for (TreeOperation operation: operations) {
+            this.operations.put(operation.name, operation);
+        }
+    }
+
+    public LinkedHashMap<String, TreeOperation> getOperations() {
+        return operations;
+    }
+
+    public List<TreeOperation> getOperationsAsList() {
+        return new ArrayList<>(operations.values());
+    }
+
+    public TreeOperation getOperation(String name) {
+        return operations.get(name);
+    }
+
+    private List<TreeOperation>
+    readOperations(Path filename) {
+        List<TreeOperation> operations = null;
+
+        // use BufferedReader because Tsurgeon.getTregexPatternFromReader does
+        try (BufferedReader reader = Files.newBufferedReader(filename)) {
+            operations = readOperations(reader);
+        } catch (IOException x) {
+            System.err.format("IOException: %s%n", x);
+        }
         return operations;
     }
 
     private List<TreeOperation>
-    getOperationsFromFile(Path filename) {
+    readOperations(BufferedReader reader) {
         List<TreeOperation> operations = new LinkedList<>();
+        TreeOperation operation;
 
-        // use BufferedReader because Tsurgeon.getTregexPatternFromReader does
-        try (BufferedReader reader = Files.newBufferedReader(filename, StandardCharsets.UTF_8)) {
-            for (; ; ) {
-                TreeOperation operation = getOperationFromReader(reader);
+        try {
+            for (; ; )  {
+                operation = readOperation(reader);
                 if (operation == null) {
                     break;
                 }
@@ -53,9 +91,10 @@ public abstract class TreeOperator {
         return operations;
     }
 
-    private TreeOperation
-    getOperationFromReader(BufferedReader reader) throws IOException {
-        String name = getOperationNameFromReader(reader);
+
+    public TreeOperation
+    readOperation(BufferedReader reader) throws IOException {
+        String name = readOperationName(reader);
 
         // get compiled pattern for matching
         String patternString = Tsurgeon.getTregexPatternFromReader(reader);
@@ -79,7 +118,7 @@ public abstract class TreeOperator {
     }
 
     private String
-    getOperationNameFromReader(BufferedReader reader) throws IOException {
+    readOperationName(BufferedReader reader) throws IOException {
         // abusing method to read Tregex pattern
         String name = Tsurgeon.getTregexPatternFromReader(reader);
         name = name.replaceAll("\\W*\\$\\W*", "");
@@ -99,4 +138,12 @@ class TreeOperation {
         this.pattern = pattern;
         this.action = action;
     }
+
+    @Override
+    public String toString() {
+        String actionStr = (action == null) ? "None" : action.toString();
+        return String.join("\n", name, pattern.toString(), actionStr);
+    }
+
+
 }

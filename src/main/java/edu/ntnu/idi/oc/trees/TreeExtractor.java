@@ -4,6 +4,7 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.tregex.TregexMatcher;
 import edu.stanford.nlp.trees.tregex.tsurgeon.TsurgeonMatcher;
 
+import java.io.BufferedReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -19,8 +20,14 @@ public class TreeExtractor extends TreeOperator {
         super(operations);
         this.label = label;
     }
+
     public TreeExtractor(String label, Path filename) {
         super(filename);
+        this.label = label;
+    }
+
+    public TreeExtractor(String label, BufferedReader reader) {
+        super(reader);
         this.label = label;
     }
 
@@ -30,9 +37,9 @@ public class TreeExtractor extends TreeOperator {
 
     public List<Extract>
     extractTrees(Tree tree) {
-        List<Extract> extracts = new LinkedList<>();
+        List<Extract> extracts = new ArrayList<>(25);
 
-        for (TreeOperation operation: this.getOperations()) {
+        for (TreeOperation operation: this.getOperationsAsList()) {
             extractTrees(operation, tree, extracts);
         }
         return extracts;
@@ -42,7 +49,7 @@ public class TreeExtractor extends TreeOperator {
     extractTrees(TreeOperation operation,
                  Tree tree,
                  List<Extract> extracts) {
-        List<Integer> nodeNumbers = new ArrayList<>(10);
+        List<Integer> nodeNumbers = new ArrayList<>(5);
 
         TregexMatcher patternMatcher = operation.pattern.matcher(tree);
 

@@ -14,7 +14,7 @@ public class TransformationTest {
     @Test
     public void testTransform() throws Exception {
         Transformation transformation = new Transformation();
-        transformation.addTransformer(Paths.get("src/test/resources/transforms/coordination.tfm"));
+        transformation.addTransformer(Paths.get("src/main/resources/tsurgeon/prune/coordination.tfm"));
 
         Path inRecords = Paths.get("src/test/resources/extractions.json");
         Path outRecords = Paths.get("src/test/resources/transformed.json");

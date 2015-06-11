@@ -1,0 +1,60 @@
+%*****************************************************************************
+%
+%    NON_RESTRICTIVE MODIFIERS
+%
+%*****************************************************************************
+
+
+%-----------------------------------------------------------------------------
+$ Non-restrictive Clause Strip $
+%-----------------------------------------------------------------------------
+
+% Strip non-restrictive relative clause
+
+% Examples:
+%
+% oceanic dissolved oxygen , which are probably influenced by global warming
+%     === Relative Clause Strip ===>
+%         oceanic dissolved oxygen
+%
+% the decadal temporal stability of the ecosystem , whether measured with intervals of two , five or ten years ,
+%      === Relative Clause Strip ===>
+%          the decadal temporal stability of the ecosystem ,
+
+/^,/=punc $. SBAR=sent
+
+delete punc sent
+
+
+%-----------------------------------------------------------------------------
+$ Non-restrictive Modifier Strip 1 $
+%-----------------------------------------------------------------------------
+
+% With trailing comma
+
+% Examples:
+%
+% levels of nitrogen trifluoride , used to make plasma TVs ,
+%      === Non-restrictive Modifier Strip ===>
+%          levels of nitrogen trifluoride
+
+/.*P/=xp > NP $, /^,/=punc1 $. /^,/=punc2 !$ CC
+
+delete punc1 xp punc2
+
+%-----------------------------------------------------------------------------
+$ Non-restrictive Modifier Strip 2 $
+%-----------------------------------------------------------------------------
+
+% Without trailing comma
+
+% Examples:
+%
+% rates of carbon sequestration , a theory known as the ` iron hypothesis '
+%      === Non-restrictive Modifier Strip 2 ===>
+%          rates of carbon sequestration
+
+/.*P/=xp > NP $, /^,/=punc !$. /^,/ !$ CC
+
+delete punc xp
+

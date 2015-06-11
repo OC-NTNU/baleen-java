@@ -1,0 +1,88 @@
+%*****************************************************************************
+%
+%    RESTRICTIVE MODIFIERS
+%
+%*****************************************************************************
+
+
+%=============================================================================
+% Prepositional Phrase Modifiers
+%=============================================================================
+
+% Examples:
+%
+%  aboveground herbivory in grass phytometers exposed to all eight 
+%  combinations of climate change factors for three years
+%     === Strip PP ===>
+%         aboveground herbivory in grass phytometers exposed to all eight 
+%         combinations of climate change factors
+%             === Strip PP ===>
+%                 aboveground herbivory in grass phytometers exposed to 
+%                 all eight combinations
+%                     === Strip PP ===>
+%                         aboveground herbivory in grass phytometers exposed
+%                             === Strip PP ===>
+%                                 aboveground herbivory
+
+
+%-----------------------------------------------------------------------------
+$ Strip PP $
+%-----------------------------------------------------------------------------
+
+PP=pp !<< PP !$ CC|CONJP
+
+delete pp
+
+
+%=============================================================================
+% Sentence Modifiers
+%=============================================================================
+
+% Restrictive clause modifiers, not part of a coordination. 
+
+% Examples:
+%
+%  carbon to the atmosphere that could exacerbate climate change
+%     === Strip SBAR ===>
+%         carbon to the atmosphere
+%
+% species that belong to families that include known coral pathogens 
+% ( Alteromonadaceae , Vibrionaceae ) , bacteria previously isolated from 
+% diseased , stressed or injured marine invertebrates ( for example , 
+% Rhodobacteraceae ) , and other species ( for example , Campylobacteraceae )
+%     === Strip SBAR ===>
+%         species that belong to families
+%              === Strip SBAR ===>
+
+
+%-----------------------------------------------------------------------------
+$ Strip SBAR $
+%-----------------------------------------------------------------------------
+
+SBAR=sbar !<< SBAR !$ CC|CONJP !$, /^\W+/
+
+delete sbar
+
+
+%=============================================================================
+% Premodifiers
+%=============================================================================
+
+% Examples:
+%
+% the global ocean circulation
+%     === Strip Premodifier ===>
+%         global ocean circulation
+%             === Strip Premodifier ===>
+%                 ocean circulation
+%                     === Strip Premodifier ===>
+%                         circulation
+
+
+%-----------------------------------------------------------------------------
+$ Strip Premodifier $
+%-----------------------------------------------------------------------------
+
+NP <1 __=premod <# __=head !<1 =head !< CC|CONJP
+
+delete premod

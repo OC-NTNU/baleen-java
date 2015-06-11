@@ -1,0 +1,90 @@
+%*****************************************************************************
+%
+%    PARENTHETICAL
+%
+%*****************************************************************************
+
+%-----------------------------------------------------------------------------
+$ Parenthetical Strip 1 $
+%-----------------------------------------------------------------------------
+
+% Examples:
+%
+% Radiation size ( measured as the number of new types )
+%      === Parenthetical Strip ===>
+%          Radiation size
+% 
+% CO2 concentrations in the upper atmosphere -- probably the primary driver of long-term thermospheric trends --
+%      === Parenthetical Strip ===>
+%          CO2 concentrations in the upper atmosphere
+
+PRN=prn
+
+delete prn
+
+%-----------------------------------------------------------------------------
+$ Parenthetical Strip 2.1 $
+%-----------------------------------------------------------------------------
+
+% This covers cases where a parenthetical is not dominated by a PRN node.
+
+% Note: there seems to be no way to generalize this to an arbitrary number 
+% of items between parenthesis...
+
+% Examples:
+%
+% atmospheric radiocarbon ( 14C ) concentrations
+%      === Parenthetical Strip 2.1 ===>
+%          atmospheric radiocarbon concentrations
+
+NP < ( -LRB-=x1 $. (__=x2 $. -RRB-=x3 ))
+
+delete x1 x2 x3
+
+%-----------------------------------------------------------------------------
+$ Parenthetical Strip 2.2 $
+%-----------------------------------------------------------------------------
+
+% Examples:
+%
+% chemistry ( or both )
+%     === Parenthetical Strip 2.2 ===>
+%         chemistry
+
+NP < ( -LRB-=x1 $. ( __=x2 $. ( __=x3 $. -RRB-=x4)))
+
+delete x1 x2 x3 x4
+
+
+%-----------------------------------------------------------------------------
+$ Parenthetical Strip 2.3 $
+%-----------------------------------------------------------------------------
+
+% Examples:
+%
+% 
+
+NP < ( -LRB-=x1 $. ( __=x2 $. ( __=x3 $. ( __=x4 $. -RRB-=x5))))
+
+delete x1 x2 x3 x4 x5
+
+
+%-----------------------------------------------------------------------------
+$ List Strip $
+%-----------------------------------------------------------------------------
+
+% Examples:
+%
+% ( 1 ) the rate of temperature change and ( 2 ) sea-level rise
+%      === List Strip ===>
+%          the rate of temperature change and sea-level rise
+
+LST=lst
+
+delete lst
+
+
+
+
+
+

@@ -12,9 +12,9 @@ public class ExtractionTest {
     @Test
     public void testExtract() throws Exception {
         Extraction extraction = new Extraction();
-        extraction.addExtractor("change", Paths.get("src/test/resources/transforms/change.tfm"));
-        extraction.addExtractor("increase", Paths.get("src/test/resources/transforms/increase.tfm"));
-        extraction.addExtractor("decrease", Paths.get("src/test/resources/transforms/decrease.tfm"));
+        extraction.addExtractor("change", Paths.get("src/main/resources/tsurgeon/extract/change.tfm"));
+        extraction.addExtractor("increase", Paths.get("src/main/resources/tsurgeon/extract//increase.tfm"));
+        extraction.addExtractor("decrease", Paths.get("src/main/resources/tsurgeon/extract/decrease.tfm"));
 
         Path extractFile = Paths.get("src/test/resources/extractions.json");
         Files.deleteIfExists(extractFile);
@@ -33,9 +33,9 @@ public class ExtractionTest {
 
                 "src/test/resources/extractions.json",
 
-                "change:src/test/resources/transforms/change.tfm",
-                "increase:src/test/resources/transforms/increase.tfm",
-                "decrease:src/test/resources/transforms/decrease.tfm"
+                "change:src/main/resources/tsurgeon/extract/change.tfm",
+                "increase:src/main/resources/tsurgeon/extract/increase.tfm",
+                "decrease:src/main/resources/tsurgeon/extract/decrease.tfm"
         };
 
         Path extractFile = Paths.get(args[1]);
