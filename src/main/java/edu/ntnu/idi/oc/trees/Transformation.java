@@ -81,6 +81,10 @@ public class Transformation {
         transformers.add(new TreeTransformer(filename));
     }
 
+    public void addTransformer(InputStream stream) throws IOException {
+        transformers.add(new TreeTransformer(stream));
+    }
+
     public  void
     apply(Path inFilename,
           Path outFilename) {

@@ -3,4 +3,4 @@
 SCRIPTDIR=`dirname $0`
 PROJECTDIR=$SCRIPTDIR/..
 
-java -cp ".:$PROJECTDIR/lib/*:$PROJECTDIR/target/classes" Extraction "$@"
+java -cp ".:$PROJECTDIR/lib/*:$PROJECTDIR/target/classes" edu.ntnu.idi.oc.trees.Extraction "$@"

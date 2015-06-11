@@ -80,6 +80,10 @@ public class Extraction {
         extractors.add(new TreeExtractor(label, filename));
     }
 
+    public void addExtractor(String label, InputStream stream) throws IOException {
+        extractors.add(new TreeExtractor(label, stream));
+    }
+
     public void apply(Path treesPath, Path extractFile) {
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         JsonFactory factory = mapper.getFactory();

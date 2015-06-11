@@ -6,6 +6,8 @@ import edu.stanford.nlp.trees.tregex.TregexMatcher;
 import edu.stanford.nlp.trees.tregex.tsurgeon.TsurgeonMatcher;
 
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -25,8 +27,8 @@ public class TreeTransformer extends TreeOperator {
         super(filename);
     }
 
-    public TreeTransformer(BufferedReader reader) {
-        super(reader);
+    public TreeTransformer(InputStream stream) throws IOException {
+        super(stream);
     }
 
     public List<Transform>

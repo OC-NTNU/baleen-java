@@ -5,9 +5,7 @@ import edu.ntnu.idi.oc.trees.TreeTransformer;
 import edu.stanford.nlp.trees.Tree;
 import org.junit.Before;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import static org.junit.Assert.assertEquals;
 
@@ -23,10 +21,7 @@ public abstract class PruneTest {
 
         // finds resource with the given name
         InputStream stream = cLoader.getResourceAsStream(transformationsFile);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-        transformer = new TreeTransformer(reader);
-
-        reader.close();
+        transformer = new TreeTransformer(stream);
         stream.close();
     }
 

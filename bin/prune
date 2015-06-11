@@ -1,6 +1,0 @@
-#!/bin/sh
-
-SCRIPTDIR=`dirname $0`
-PROJECTDIR=$SCRIPTDIR/..
-
-java -cp ".:$PROJECTDIR/lib/*:$PROJECTDIR/target/classes" Transformation "$@"

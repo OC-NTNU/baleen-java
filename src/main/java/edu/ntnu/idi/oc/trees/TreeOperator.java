@@ -8,6 +8,8 @@ import edu.stanford.nlp.trees.tregex.tsurgeon.TsurgeonPattern;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -36,9 +38,12 @@ public abstract class TreeOperator {
         setOperationsFromList(readOperations(filename));
     }
 
-    public TreeOperator(BufferedReader reader) {
+    public TreeOperator(InputStream stream) throws IOException {
+        // for use with cLoader.getResourceAsStream
         this();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         setOperationsFromList(readOperations(reader));
+        reader.close();
     }
 
     private void setOperationsFromList(List<TreeOperation> operations) {

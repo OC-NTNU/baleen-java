@@ -6,6 +6,12 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import net.sourceforge.argparse4j.inf.Namespace;
+
 import edu.stanford.nlp.util.StringUtils;
 
 import java.io.BufferedReader;
@@ -28,12 +34,27 @@ public class Trace {
     private final String TRANS_TEMPLATE = "%s=== %s ===>";
 
     public static void main(String[] args) {
-        Path inFilename = Paths.get(args[0]);
-        Trace trace = new Trace(inFilename);
+
+        ArgumentParser parser = ArgumentParsers.newArgumentParser("Trace")
+                .description("Trace transformation history");
+        parser.addArgument("records")
+                .metavar("RECORDS")
+                .help("results of transformation in JSON format");
+
+        Namespace namespace = null;
+        try {
+            namespace = parser.parseArgs(args);
+        } catch (ArgumentParserException e) {
+            parser.handleError(e);
+            System.exit(1);
+        }
+
+        Path recordsPath = Paths.get(namespace.getString("records"));
+        new Trace(recordsPath);
     }
 
-    public Trace(Path inFilename) {
-        readTransforms(inFilename);
+    public Trace(Path recordsFilename) {
+        readRecords(recordsFilename);
         writeTrace();
     }
 
@@ -59,18 +80,18 @@ public class Trace {
         }
     }
 
-    public void readTransforms(Path inFilename) {
+    public void readRecords(Path recordsPath) {
         origins = new ArrayList<>(1000);
         descendants = new HashMap<>();
 
-        try (BufferedReader reader = Files.newBufferedReader(inFilename)) {
+        try (BufferedReader reader = Files.newBufferedReader(recordsPath)) {
             ObjectMapper mapper = new ObjectMapper();
             JsonFactory factory = mapper.getFactory();
             JsonParser parser = factory.createParser(reader);
             ObjectNode node;
 
             if(parser.nextToken() != JsonToken.START_ARRAY) {
-                throw new IllegalStateException("Expected an array at start of Json file " + inFilename);
+                throw new IllegalStateException("Expected an array at start of Json file " + recordsPath);
             }
 
             while(parser.nextToken() == JsonToken.START_OBJECT) {
