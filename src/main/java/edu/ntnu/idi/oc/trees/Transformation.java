@@ -4,10 +4,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -18,6 +15,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -47,6 +45,10 @@ public class Transformation {
                 .nargs("+")
                 .metavar("TRANS")
                 .help("operations file in Transformer format");
+        parser.addArgument("--unique")
+                .setDefault(false)
+                .action(Arguments.storeTrue())
+                .help("unique substrings (ommit duplicate results)");
 
         Namespace namespace = null;
         try {
@@ -64,8 +66,9 @@ public class Transformation {
 
         Path inRecords = Paths.get(namespace.getString("inRecords"));
         Path outRecords = Paths.get(namespace.getString("outRecords"));
+        Boolean unique = namespace.getBoolean("unique");
 
-        transformation.apply(inRecords, outRecords);
+        transformation.apply(inRecords, outRecords, unique);
     }
 
 
@@ -87,7 +90,8 @@ public class Transformation {
 
     public  void
     apply(Path inFilename,
-          Path outFilename) {
+          Path outFilename,
+          boolean unique) {
 
         try (
                 BufferedReader reader = Files.newBufferedReader(inFilename);
@@ -100,6 +104,7 @@ public class Transformation {
             JsonGenerator generator = factory.createGenerator(writer);
             ObjectNode ancestorNode;
             List<ObjectNode> descendants = new ArrayList<>(100);
+            Set<String> seen = unique ? new HashSet<>(100) : null;
 
             if(parser.nextToken() != JsonToken.START_ARRAY) {
                 throw new IllegalStateException("Expected an array at start of Json file " + inFilename);
@@ -112,7 +117,7 @@ public class Transformation {
                 // and return it as a tree model ObjectNode
                 ancestorNode = mapper.readTree(parser);
                 descendants.clear();
-                transformTree(ancestorNode, descendants);
+                transformTree(ancestorNode, descendants, seen);
                 // postponed writing of ancestor, because all its descendants need to added
                 mapper.writeValue(generator, ancestorNode);
 
@@ -131,7 +136,11 @@ public class Transformation {
         }
     }
 
-    public void transformTree(ObjectNode ancestorNode, List<ObjectNode> descendants) throws IOException{
+    public void
+    transformTree(ObjectNode ancestorNode,
+                  List<ObjectNode> descendants,
+                  Set<String> seen)
+            throws IOException {
         Tree tree = Tree.valueOf(ancestorNode.get("subTree").asText());
         ObjectNode descendantNode;
         String key, origin, subStr;
@@ -144,6 +153,16 @@ public class Transformation {
 
         for (TreeTransformer transformer: transformers) {
             for (Transform transform: transformer.transformTree(tree)) {
+                subStr = PTBTokenizer.ptb2Text(Sentence.listToString(transform.subTree.yield()));
+
+                if (seen != null) {
+                    if (seen.contains(subStr)) {
+                        continue;
+                    } else {
+                        seen.add(subStr);
+                    }
+                }
+
                 descendantNode = ancestorNode.deepCopy().remove(Collections.singletonList("descendants"));
                 key = ancestorNode.get("key").asText() + ":" + transform.operationName;
                 ancestorNode.withArray("descendants").add(key);
@@ -153,11 +172,10 @@ public class Transformation {
                 descendantNode.put("ancestor", ancestorNode.get("key").asText());
                 descendantNode.put("transformName", transform.operationName);
                 descendantNode.put("subTree", transform.subTree.toString());
-                subStr = PTBTokenizer.ptb2Text(Sentence.listToString(transform.subTree.yield()));
                 descendantNode.put("subStr", subStr);
 
                 descendants.add(descendantNode);
-                transformTree(descendantNode, descendants);
+                transformTree(descendantNode, descendants, seen);
             }
         }
     }

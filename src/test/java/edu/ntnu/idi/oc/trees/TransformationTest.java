@@ -20,7 +20,7 @@ public class TransformationTest {
         Path outRecords = Paths.get("src/test/resources/transformed.json");
         Files.deleteIfExists(outRecords);
         //Path treesPath = Paths.get("/Users/work/BigData/nature/abstracts/lemmaparse");
-        transformation.apply(inRecords, outRecords);
+        transformation.apply(inRecords, outRecords,false);
 
         assert Files.exists(outRecords);
 

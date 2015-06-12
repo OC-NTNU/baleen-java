@@ -1,6 +1,7 @@
 package edu.ntnu.idi.oc.event.var;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -32,6 +33,10 @@ public class PruneVars {
         parser.addArgument("outRecords")
                 .metavar("OUT")
                 .help("output file in JSON format");
+        parser.addArgument("--unique")
+                .setDefault(false)
+                .action(Arguments.storeTrue())
+                .help("unique substrings (ommit duplicate results)");
 
         Namespace namespace = null;
         try {
@@ -52,8 +57,9 @@ public class PruneVars {
         }
         Path inRecords = Paths.get(namespace.getString("inRecords"));
         Path outRecords = Paths.get(namespace.getString("outRecords"));
+        Boolean unique = namespace.getBoolean("unique");
 
-        transformation.apply(inRecords, outRecords);
+        transformation.apply(inRecords, outRecords, unique);
     }
 
 }
