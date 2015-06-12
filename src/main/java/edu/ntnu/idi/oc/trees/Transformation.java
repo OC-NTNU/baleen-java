@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -30,6 +31,8 @@ import edu.stanford.nlp.process.PTBTokenizer;
  */
 public class Transformation {
     private final List<TreeTransformer> transformers;
+
+    private static Logger log = Logger.getLogger("Extraction");
 
 
     public static void main(String[] args) {
@@ -117,8 +120,9 @@ public class Transformation {
                 // and return it as a tree model ObjectNode
                 ancestorNode = mapper.readTree(parser);
                 descendants.clear();
+                if (seen != null) seen.clear();
                 transformTree(ancestorNode, descendants, seen);
-                // postponed writing of ancestor, because all its descendants need to added
+                // postponed writing of ancestor, because all its descendants need to be added
                 mapper.writeValue(generator, ancestorNode);
 
                 for (ObjectNode descendantNode: descendants) {
@@ -142,6 +146,13 @@ public class Transformation {
                   Set<String> seen)
             throws IOException {
         Tree tree = Tree.valueOf(ancestorNode.get("subTree").asText());
+
+        if (tree == null) {
+            // transformation resulted in ill-formed tree, e.g. "NP"
+            log.warning("skipping ill-formed tree: " + ancestorNode);
+            return;
+        }
+
         ObjectNode descendantNode;
         String key, origin, subStr;
 
