@@ -121,6 +121,7 @@ public class Transformation {
                 ancestorNode = mapper.readTree(parser);
                 descendants.clear();
                 if (seen != null) seen.clear();
+                log.info("Transforming original node with key " + ancestorNode.get("key").asText());
                 transformTree(ancestorNode, descendants, seen);
                 // postponed writing of ancestor, because all its descendants need to be added
                 mapper.writeValue(generator, ancestorNode);
