@@ -23,6 +23,7 @@ public class PruneVars {
             "tsurgeon/prune/non-restrict.tfm",
             "tsurgeon/prune/modifiers.tfm",
     };
+    private final static int DEFAULT_MAX_TREE_SIZE = 100;
 
     public static void main(String[] args) throws IOException {
         ArgumentParser parser = ArgumentParsers.newArgumentParser("ExtractVars")
@@ -37,6 +38,12 @@ public class PruneVars {
                 .setDefault(false)
                 .action(Arguments.storeTrue())
                 .help("unique substrings (ommit duplicate results)");
+        parser.addArgument("--max-tree-size")
+                .setDefault(DEFAULT_MAX_TREE_SIZE)
+                .metavar("N")
+                .type(Integer.class)
+                .help(String.format("skip trees with more than N nodes (default %d)", DEFAULT_MAX_TREE_SIZE));
+
 
         Namespace namespace = null;
         try {
@@ -58,8 +65,9 @@ public class PruneVars {
         Path inRecords = Paths.get(namespace.getString("inRecords"));
         Path outRecords = Paths.get(namespace.getString("outRecords"));
         Boolean unique = namespace.getBoolean("unique");
+        int maxTreeSize = namespace.getInt("max_tree_size");
 
-        transformation.apply(inRecords, outRecords, unique);
+        transformation.apply(inRecords, outRecords, unique, maxTreeSize);
     }
 
 }
