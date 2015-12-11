@@ -17,9 +17,9 @@ import edu.ntnu.idi.oc.trees.Extraction;
  */
 public class ExtractVars {
     private static final String[] OPERATION_FILES = {
-            "tsurgeon/extract/change.tfm",
-            "tsurgeon/extract/decrease.tfm",
-            "tsurgeon/extract/increase.tfm"
+            "change:tsurgeon/extract/change.tfm",
+            "decrease:tsurgeon/extract/decrease.tfm",
+            "increase:tsurgeon/extract/increase.tfm"
     };
 
     public static void main(String[] args) throws IOException {
@@ -44,9 +44,10 @@ public class ExtractVars {
 
         ClassLoader cLoader = extraction.getClass().getClassLoader();
 
-        for (String file: OPERATION_FILES) {
-            InputStream stream = cLoader.getResourceAsStream(file);
-            extraction.addExtractor("change", stream);
+        for (String pair: OPERATION_FILES) {
+            String[] parts = pair.split(":", 2);
+            InputStream stream = cLoader.getResourceAsStream(parts[1]);
+            extraction.addExtractor(parts[0], stream);
             stream.close();
         }
 
