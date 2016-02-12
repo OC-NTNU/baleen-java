@@ -42,7 +42,8 @@ public class TreeExtractor extends TreeOperator {
         List<Extract> extracts = new ArrayList<>(25);
 
         for (TreeOperation operation: this.getOperationsAsList()) {
-            extractTrees(operation, tree, extracts);
+            // take a deep copy, so the tree is not modified by next operation
+            extractTrees(operation, tree.deepCopy(), extracts);
         }
         return extracts;
     }
@@ -51,41 +52,38 @@ public class TreeExtractor extends TreeOperator {
     extractTrees(TreeOperation operation,
                  Tree tree,
                  List<Extract> extracts) {
+        /* Pattern matching is applied twice, which is inefficient, as are the deep copies.
+           However, if done in one iteration, the node numbers become incorrect,
+           because nodes are deleted from the original input tree. */
+
+        Integer nodeNumber = null;
+        Tree subTree = null;
         List<Integer> nodeNumbers = new ArrayList<>(5);
 
         TregexMatcher patternMatcher = operation.pattern.matcher(tree);
 
         // 1. get numbers of matching subtrees
         while (patternMatcher.findNextMatchingNode()) {
-            Tree subTree = patternMatcher.getMatch();
-            Integer nodeNumber = subTree.nodeNumber(tree);
+            subTree = patternMatcher.getMatch();
+            nodeNumber = subTree.nodeNumber(tree);
             nodeNumbers.add(nodeNumber);
         }
 
         // 2. apply operations (if defined) to subtree
-        TsurgeonMatcher actionMatcher = null;
-
-        if (operation.action != null) {
-            actionMatcher = operation.action.matcher();
-        }
-
-        int i = 0;
+        nodeNumber = 0;
         patternMatcher.reset();
+        TsurgeonMatcher actionMatcher = (operation.action != null) ? operation.action.matcher() : null;
 
         while (patternMatcher.findNextMatchingNode()) {
-            Tree subTree = patternMatcher.getMatch();
+            subTree = patternMatcher.getMatch();
             if (actionMatcher != null) {
                 actionMatcher.evaluate(subTree, patternMatcher);
             }
-
-            // after operation, resulting subTree may be an invalid tree like "NP"
-            Extract ext = new Extract(operation.name, nodeNumbers.get(i++), subTree.deepCopy());
+            // make a copy, so the subtree is not modified by subsequent applications of this operation
+            Extract ext = new Extract(operation.name, nodeNumbers.get(nodeNumber++), subTree.deepCopy());
             extracts.add(ext);
         }
 
-        // TODO pattern matching is applied twice, which is inefficient
-        // However, if done in one iteration, the node numbers become incorrect,
-        // because nodes are deleted from the original input tree
     }
 }
 
