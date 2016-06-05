@@ -38,7 +38,7 @@ public class Extraction {
     private static Logger log = Logger.getLogger("Extraction");
 
     public static void main(String[] args) throws IOException {
-        ArgumentParser parser = ArgumentParsers.newArgumentParser("Extraction")
+        ArgumentParser parser = ArgumentParsers.newArgumentParser("extract")
                 .description("Extraction matching subtrees from trees");
         parser.addArgument("trees")
                 .metavar("TREES")
@@ -74,12 +74,12 @@ public class Extraction {
 
     public Extraction(List<TreeExtractor> extractors) {
         this.extractors = extractors;
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        factory = mapper.getFactory();
     }
 
     public Extraction() {
         this(new ArrayList<>(10));
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        factory = mapper.getFactory();
     }
 
     public void addExtractor(String label, Path filename) {
@@ -111,28 +111,25 @@ public class Extraction {
                 extractDir.toString(),
                 FilenameUtils.getBaseName(treeFile.toString()) + outFileTag + ".json"));
 
-        try (BufferedReader reader = Files.newBufferedReader(treeFile)) {
-            try (BufferedWriter writer = Files.newBufferedWriter(extractFile)) {
-                generator = factory.createGenerator(writer);
-                generator.writeStartArray();
-                int treeNumber = 0;
-                String line;
+        try (BufferedReader reader = Files.newBufferedReader(treeFile);
+             BufferedWriter writer = Files.newBufferedWriter(extractFile)) {
+            generator = factory.createGenerator(writer);
+            generator.writeStartArray();
+            int treeNumber = 0;
+            String line;
 
-                while ((line = reader.readLine()) != null) {
-                    Tree tree = Tree.valueOf(line);
+            while ((line = reader.readLine()) != null) {
+                Tree tree = Tree.valueOf(line);
 
-                    if (tree == null) {
-                        log.warning("Skipping ill-formed tree: " + line);
-                    } else {
-                        extractFromTree(treeFile.getFileName().toString(), ++treeNumber, tree);
-                    }
+                if (tree == null) {
+                    log.warning("Skipping ill-formed tree: " + line);
+                } else {
+                    extractFromTree(treeFile.getFileName().toString(), ++treeNumber, tree);
                 }
-
-                generator.writeEndArray();
-                generator.close();
-            } catch (IOException x) {
-                System.err.format("IOException: %s%n", x);
             }
+
+            generator.writeEndArray();
+            generator.close();
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
         }

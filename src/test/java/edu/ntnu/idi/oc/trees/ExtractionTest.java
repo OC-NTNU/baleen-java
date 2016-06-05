@@ -18,8 +18,11 @@ public class ExtractionTest {
         extraction.addExtractor("increase", Paths.get("src/main/resources/tsurgeon/extract//increase.tfm"));
         extraction.addExtractor("decrease", Paths.get("src/main/resources/tsurgeon/extract/decrease.tfm"));
 
-        Path extractDir = Paths.get("src/test/resources/output");
-        FileUtils.cleanDirectory(extractDir.toFile());
+        Path extractDir = Paths.get("src/test/out/ext");
+
+        if (Files.exists(extractDir)) {
+            FileUtils.cleanDirectory(extractDir.toFile());
+        }
         Path treesPath = Paths.get("src/test/resources/trees");
 
         extraction.apply(treesPath, extractDir);
@@ -33,7 +36,7 @@ public class ExtractionTest {
         String[] args = {
                 "src/test/resources/trees",
 
-                "src/test/resources/output",
+                "src/test/out/ext",
 
                 "change:src/main/resources/tsurgeon/extract/change.tfm",
                 "increase:src/main/resources/tsurgeon/extract/increase.tfm",
@@ -41,7 +44,10 @@ public class ExtractionTest {
         };
 
         Path extractDir = Paths.get(args[1]);
-        FileUtils.cleanDirectory(extractDir.toFile());
+
+        if (Files.exists(extractDir)) {
+            FileUtils.cleanDirectory(extractDir.toFile());
+        }
 
         Extraction.main(args);
 

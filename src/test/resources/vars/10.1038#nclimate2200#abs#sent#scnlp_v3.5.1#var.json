@@ -1,0 +1,28 @@
+[ {
+  "key" : "10.1038#nclimate2200#abs#sent#scnlp_v3.5.1.parse:2:5:NOM1_change",
+  "label" : "change",
+  "filename" : "10.1038#nclimate2200#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 2,
+  "extractName" : "NOM1_change",
+  "nodeNumber" : 5,
+  "subTree" : "(NP (NN climate))",
+  "subStr" : "climate"
+}, {
+  "key" : "10.1038#nclimate2200#abs#sent#scnlp_v3.5.1.parse:2:12:NOM1_loss",
+  "label" : "decrease",
+  "filename" : "10.1038#nclimate2200#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 2,
+  "extractName" : "NOM1_loss",
+  "nodeNumber" : 12,
+  "subTree" : "(NP (NN biodiversity))",
+  "subStr" : "biodiversity"
+}, {
+  "key" : "10.1038#nclimate2200#abs#sent#scnlp_v3.5.1.parse:5:28:OBJ_accumulate",
+  "label" : "increase",
+  "filename" : "10.1038#nclimate2200#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 5,
+  "extractName" : "OBJ_accumulate",
+  "nodeNumber" : 28,
+  "subTree" : "(NP (JJ significant) (NN carbon) (NNS stock))",
+  "subStr" : "significant carbon stock"
+} ]

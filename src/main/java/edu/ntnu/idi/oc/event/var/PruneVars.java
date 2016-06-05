@@ -26,14 +26,14 @@ public class PruneVars {
     private final static int DEFAULT_MAX_TREE_SIZE = 100;
 
     public static void main(String[] args) throws IOException {
-        ArgumentParser parser = ArgumentParsers.newArgumentParser("ExtractVars")
+        ArgumentParser parser = ArgumentParsers.newArgumentParser("prune-vars")
                 .description("Prune changing/increasing/decreasing variables");
-        parser.addArgument("inRecords")
+        parser.addArgument("varsPath")
                 .metavar("IN")
-                .help("input file in JSON format");
-        parser.addArgument("outRecords")
+                .help("file or directory containing extracted variables in JSON format");
+        parser.addArgument("transDir")
                 .metavar("OUT")
-                .help("output file in JSON format");
+                .help("directory for writing extracted variables JSON format");
         parser.addArgument("--unique")
                 .setDefault(false)
                 .action(Arguments.storeTrue())
@@ -62,12 +62,12 @@ public class PruneVars {
             transformation.addTransformer(stream);
             stream.close();
         }
-        Path inRecords = Paths.get(namespace.getString("inRecords"));
-        Path outRecords = Paths.get(namespace.getString("outRecords"));
+        Path varsPath = Paths.get(namespace.getString("varsPath"));
+        Path transDir = Paths.get(namespace.getString("transDir"));
         Boolean unique = namespace.getBoolean("unique");
         int maxTreeSize = namespace.getInt("max_tree_size");
 
-        transformation.apply(inRecords, outRecords, unique, maxTreeSize);
+        transformation.apply(varsPath, transDir, unique, maxTreeSize);
     }
 
 }

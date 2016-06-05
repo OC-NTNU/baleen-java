@@ -24,27 +24,33 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.ling.Sentence;
 import edu.stanford.nlp.process.PTBTokenizer;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
 
 /**
  * Transformation subtrees with Tsurgeon operations
  */
 public class Transformation {
+    ObjectMapper mapper = new ObjectMapper();
+    private JsonGenerator generator;
+    private JsonFactory factory;
     private final List<TreeTransformer> transformers;
     private final static int DEFAULT_MAX_TREE_SIZE = 100;
+    private final String outFileTag = "#trans";
 
-    private static Logger log = Logger.getLogger("Extraction");
+    private static Logger log = Logger.getLogger("Transformation");
 
 
     public static void main(String[] args) {
-        ArgumentParser parser = ArgumentParsers.newArgumentParser("Transformation")
-                .description("Transformation variable trees");
-        parser.addArgument("inRecords")
+        ArgumentParser parser = ArgumentParsers.newArgumentParser("transform")
+                .description("Transform variables");
+        parser.addArgument("varsPath")
                 .metavar("IN")
-                .help("input file in JSON format");
-        parser.addArgument("outRecords")
+                .help("file or directory containing extracted variables in JSON format");
+        parser.addArgument("transDir")
                 .metavar("OUT")
-                .help("output file in JSON format");
+                .help("directory for writing extracted variables JSON format");
         parser.addArgument("transforms")
                 .nargs("+")
                 .metavar("TRANS")
@@ -69,21 +75,23 @@ public class Transformation {
 
         Transformation transformation = new Transformation();
 
-        for (String trans: namespace.<String>getList("transforms")) {
+        for (String trans : namespace.<String>getList("transforms")) {
             transformation.addTransformer(Paths.get(trans));
         }
 
-        Path inRecords = Paths.get(namespace.getString("inRecords"));
-        Path outRecords = Paths.get(namespace.getString("outRecords"));
+        Path varsPath = Paths.get(namespace.getString("varsPath"));
+        Path transDir = Paths.get(namespace.getString("transDir"));
         Boolean unique = namespace.getBoolean("unique");
         int maxTreeSize = namespace.getInt("max_tree_size");
 
-        transformation.apply(inRecords, outRecords, unique, maxTreeSize);
+        transformation.apply(varsPath, transDir, unique, maxTreeSize);
     }
 
 
     public Transformation(List<TreeTransformer> transformers) {
         this.transformers = transformers;
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        factory = mapper.getFactory();
     }
 
     public Transformation() {
@@ -98,50 +106,70 @@ public class Transformation {
         transformers.add(new TreeTransformer(stream));
     }
 
-    public  void
-    apply(Path inFilename,
-          Path outFilename,
+    public void
+    apply(Path varsPath,
+          Path transDir,
           boolean unique) {
-        apply(inFilename, outFilename, unique, DEFAULT_MAX_TREE_SIZE);
+        apply(varsPath, transDir, unique, DEFAULT_MAX_TREE_SIZE);
     }
 
-    public  void
-    apply(Path inFilename,
-          Path outFilename,
+    public void
+    apply(Path varsPath,
+          Path transDir,
           boolean unique,
           int maxTreeSize) {
+        try {
+            FileUtils.forceMkdir(transDir.toFile());
+
+            Files.walk(varsPath)
+                    .filter(Files::isRegularFile)
+                    .forEach(p -> transformFile(p, transDir, unique, maxTreeSize));
+        } catch (IOException x) {
+            System.err.format("IOException: %s%n", x);
+        }
+    }
+
+    public void
+    transformFile(Path varFile,
+                  Path transDir,
+                  boolean unique,
+                  int maxTreeSize) {
+        // construct output filename
+        Path transFile = Paths.get(FilenameUtils.concat(
+                transDir.toString(),
+                FilenameUtils.getBaseName(varFile.toString()) + outFileTag + ".json"));
+
+        log.info("reading variables from " + varFile);
+        log.info("writing transformed variables to " + transFile);
 
         try (
-                BufferedReader reader = Files.newBufferedReader(inFilename);
-                BufferedWriter writer = Files.newBufferedWriter(outFilename)
+                BufferedReader reader = Files.newBufferedReader(varFile);
+                BufferedWriter writer = Files.newBufferedWriter(transFile)
         ) {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            JsonFactory factory = mapper.getFactory();
             JsonParser parser = factory.createParser(reader);
             JsonGenerator generator = factory.createGenerator(writer);
             ObjectNode ancestorNode;
             List<ObjectNode> descendants = new ArrayList<>(500);
             Set<String> seen = unique ? new HashSet<>(500) : null;
 
-            if(parser.nextToken() != JsonToken.START_ARRAY) {
-                throw new IllegalStateException("Expected an array at start of Json file " + inFilename);
+            if (parser.nextToken() != JsonToken.START_ARRAY) {
+                throw new IllegalStateException("Expected an array at start of Json file " + varFile);
             }
 
             generator.writeStartArray();
 
-            while(parser.nextToken() == JsonToken.START_OBJECT) {
+            while (parser.nextToken() == JsonToken.START_OBJECT) {
                 // read everything from this START_OBJECT to the matching END_OBJECT
                 // and return it as a tree model ObjectNode
                 ancestorNode = mapper.readTree(parser);
                 descendants.clear();
                 if (seen != null) seen.clear();
-                log.info("Transforming original node with key " + ancestorNode.get("key").asText());
+                //log.info("Transforming original node with key " + ancestorNode.get("key").asText());
                 transformTree(ancestorNode, descendants, seen, maxTreeSize);
                 // postponed writing of ancestor, because all its descendants need to be added
                 mapper.writeValue(generator, ancestorNode);
 
-                for (ObjectNode descendantNode: descendants) {
+                for (ObjectNode descendantNode : descendants) {
                     mapper.writeValue(generator, descendantNode);
                 }
             }
@@ -185,8 +213,8 @@ public class Transformation {
             origin = ancestorNode.get("key").asText();
         }
 
-        for (TreeTransformer transformer: transformers) {
-            for (Transform transform: transformer.transformTree(tree)) {
+        for (TreeTransformer transformer : transformers) {
+            for (Transform transform : transformer.transformTree(tree)) {
                 subStr = PTBTokenizer.ptb2Text(Sentence.listToString(transform.subTree.yield()));
 
                 if (seen != null) {
