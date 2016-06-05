@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
+
 /**
  * Created by work on 05/06/15.
  */
@@ -16,13 +18,14 @@ public class TransformationTest {
         Transformation transformation = new Transformation();
         transformation.addTransformer(Paths.get("src/main/resources/tsurgeon/prune/coordination.tfm"));
 
-        Path inRecords = Paths.get("src/test/resources/extractions.json");
-        Path outRecords = Paths.get("src/test/resources/transformed.json");
-        Files.deleteIfExists(outRecords);
-        //Path treesPath = Paths.get("/Users/work/BigData/nature/abstracts/lemmaparse");
-        transformation.apply(inRecords, outRecords,false);
+        Path varRecords = Paths.get("src/test/resources/vars");
+        Path transDir = Paths.get("src/test/out/trans");
+        if (Files.exists(transDir)) {
+            FileUtils.cleanDirectory(transDir.toFile());
+        };
+        transformation.apply(varRecords, transDir,false);
 
-        assert Files.exists(outRecords);
+        assert Files.exists(transDir);
 
     }
 

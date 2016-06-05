@@ -12,6 +12,8 @@ import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -29,19 +31,21 @@ public class Extraction {
     private final List<TreeExtractor> extractors;
     ObjectMapper mapper = new ObjectMapper();
     private JsonGenerator generator;
+    private JsonFactory factory;
+    private final String outFileTag = "#var";
 
 
     private static Logger log = Logger.getLogger("Extraction");
 
     public static void main(String[] args) throws IOException {
-        ArgumentParser parser = ArgumentParsers.newArgumentParser("Extraction")
+        ArgumentParser parser = ArgumentParsers.newArgumentParser("extract")
                 .description("Extraction matching subtrees from trees");
         parser.addArgument("trees")
                 .metavar("TREES")
                 .help("file or directory containing trees in PTB format");
         parser.addArgument("extraction")
                 .metavar("EXTRACT")
-                .help("file for writing extractions in JSON format");
+                .help("directory for writing extractions in JSON format");
         parser.addArgument("trans")
                 .nargs("+")
                 .metavar("LABEL:TRANS")
@@ -57,19 +61,21 @@ public class Extraction {
 
         Extraction extraction = new Extraction();
 
-        for (String pair: namespace.<String>getList("trans")) {
+        for (String pair : namespace.<String>getList("trans")) {
             String[] parts = pair.split(":", 2);
             extraction.addExtractor(parts[0], Paths.get(parts[1]));
         }
 
         Path treesPath = Paths.get(namespace.getString("trees"));
-        Path extractFile = Paths.get(namespace.getString("extraction"));
+        Path extractDir = Paths.get(namespace.getString("extraction"));
 
-        extraction.apply(treesPath, extractFile);
+        extraction.apply(treesPath, extractDir);
     }
 
     public Extraction(List<TreeExtractor> extractors) {
         this.extractors = extractors;
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        factory = mapper.getFactory();
     }
 
     public Extraction() {
@@ -84,30 +90,31 @@ public class Extraction {
         extractors.add(new TreeExtractor(label, stream));
     }
 
-    public void apply(Path treesPath, Path extractFile) {
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        JsonFactory factory = mapper.getFactory();
-
-        try (BufferedWriter writer = Files.newBufferedWriter(extractFile)) {
-            generator = factory.createGenerator(writer);
-            generator.writeStartArray();
+    public void apply(Path treesPath, Path extractDir) {
+        try {
+            FileUtils.forceMkdir(extractDir.toFile());
 
             Files.walk(treesPath)
                     .filter(Files::isRegularFile)
-                    .forEach(this::extractFromFile);
-
-            generator.writeEndArray();
-            generator.close();
+                    .forEach(p -> extractFromFile(p, extractDir));
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
         }
     }
 
-    private void extractFromFile(Path treeFile) {
+
+    private void extractFromFile(Path treeFile, Path extractDir) {
         log.info(treeFile.toString());
 
-        try (BufferedReader reader = Files.newBufferedReader(treeFile)) {
-            String filename = treeFile.getFileName().toString();
+        // construct output filename
+        Path extractFile = Paths.get(FilenameUtils.concat(
+                extractDir.toString(),
+                FilenameUtils.getBaseName(treeFile.toString()) + outFileTag + ".json"));
+
+        try (BufferedReader reader = Files.newBufferedReader(treeFile);
+             BufferedWriter writer = Files.newBufferedWriter(extractFile)) {
+            generator = factory.createGenerator(writer);
+            generator.writeStartArray();
             int treeNumber = 0;
             String line;
 
@@ -117,22 +124,26 @@ public class Extraction {
                 if (tree == null) {
                     log.warning("Skipping ill-formed tree: " + line);
                 } else {
-                    extractFromTree(filename, ++treeNumber, tree);
+                    extractFromTree(treeFile.getFileName().toString(), ++treeNumber, tree);
                 }
             }
+
+            generator.writeEndArray();
+            generator.close();
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
         }
     }
 
+
     private void extractFromTree(String filename, int treeNumber, Tree tree) throws IOException {
         String key;
 
-        for (TreeExtractor extractor: extractors) {
+        for (TreeExtractor extractor : extractors) {
             for (Extract extract : extractor.extractTrees(tree)) {
                 ObjectNode node = mapper.createObjectNode();
                 // construct unique key
-                key = String.join(":", filename,  String.valueOf(treeNumber), String.valueOf(extract.nodeNumber),
+                key = String.join(":", filename, String.valueOf(treeNumber), String.valueOf(extract.nodeNumber),
                         extract.operationName);
                 node.put("key", key);
                 node.put("label", extractor.getLabel());

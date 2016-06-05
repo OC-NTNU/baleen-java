@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
+
 
 public class ExtractionTest {
 
@@ -16,13 +18,16 @@ public class ExtractionTest {
         extraction.addExtractor("increase", Paths.get("src/main/resources/tsurgeon/extract//increase.tfm"));
         extraction.addExtractor("decrease", Paths.get("src/main/resources/tsurgeon/extract/decrease.tfm"));
 
-        Path extractFile = Paths.get("src/test/resources/extractions.json");
-        Files.deleteIfExists(extractFile);
-        Path treesPath = Paths.get("src/test/resources/trees");
-        //Path treesPath = Paths.get("/Users/work/BigData/nature/abstracts/lemmaparse");
-        extraction.apply(treesPath, extractFile);
+        Path extractDir = Paths.get("src/test/out/ext");
 
-        assert Files.exists(extractFile);
+        if (Files.exists(extractDir)) {
+            FileUtils.cleanDirectory(extractDir.toFile());
+        }
+        Path treesPath = Paths.get("src/test/resources/trees");
+
+        extraction.apply(treesPath, extractDir);
+
+        assert Files.exists(extractDir);
 
     }
 
@@ -31,19 +36,22 @@ public class ExtractionTest {
         String[] args = {
                 "src/test/resources/trees",
 
-                "src/test/resources/extractions.json",
+                "src/test/out/ext",
 
                 "change:src/main/resources/tsurgeon/extract/change.tfm",
                 "increase:src/main/resources/tsurgeon/extract/increase.tfm",
                 "decrease:src/main/resources/tsurgeon/extract/decrease.tfm"
         };
 
-        Path extractFile = Paths.get(args[1]);
-        Files.deleteIfExists(extractFile);
+        Path extractDir = Paths.get(args[1]);
+
+        if (Files.exists(extractDir)) {
+            FileUtils.cleanDirectory(extractDir.toFile());
+        }
 
         Extraction.main(args);
 
-        assert Files.exists(extractFile);
+        assert Files.exists(extractDir);
     }
 
 }

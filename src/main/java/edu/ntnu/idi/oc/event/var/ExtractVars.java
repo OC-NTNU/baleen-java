@@ -23,14 +23,14 @@ public class ExtractVars {
     };
 
     public static void main(String[] args) throws IOException {
-        ArgumentParser parser = ArgumentParsers.newArgumentParser("ExtractVars")
+        ArgumentParser parser = ArgumentParsers.newArgumentParser("extract-vars")
                 .description("Extract changing/increasing/decreasing variables");
         parser.addArgument("trees")
                 .metavar("TREES")
                 .help("file or directory containing trees in PTB format");
         parser.addArgument("extraction")
                 .metavar("EXTRACT")
-                .help("file for writing extractions in JSON format");
+                .help("directory for writing extractions in JSON format");
 
         Namespace namespace = null;
         try {
@@ -52,9 +52,9 @@ public class ExtractVars {
         }
 
         Path treesPath = Paths.get(namespace.getString("trees"));
-        Path extractFile = Paths.get(namespace.getString("extraction"));
+        Path extractDir = Paths.get(namespace.getString("extraction"));
 
-        extraction.apply(treesPath, extractFile);
+        extraction.apply(treesPath, extractDir);
     }
 
 }

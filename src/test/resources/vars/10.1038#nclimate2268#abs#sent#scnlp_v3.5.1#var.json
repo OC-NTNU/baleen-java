@@ -1,0 +1,199 @@
+[ {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:1:19:PCOMP_variance",
+  "label" : "change",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 1,
+  "extractName" : "PCOMP_variance",
+  "nodeNumber" : 19,
+  "subTree" : "(NP (JJ northern) (JJ mid))",
+  "subStr" : "northern mid"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:1:11:OBJ_decrease",
+  "label" : "decrease",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 1,
+  "extractName" : "OBJ_decrease",
+  "nodeNumber" : 11,
+  "subTree" : "(NP (NN temperature) (NN variance))",
+  "subStr" : "temperature variance"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:2:10:NOM1_variability",
+  "label" : "change",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 2,
+  "extractName" : "NOM1_variability",
+  "nodeNumber" : 10,
+  "subTree" : "(NP (NN climate))",
+  "subStr" : "climate"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:2:10:PCOMP_change",
+  "label" : "change",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 2,
+  "extractName" : "PCOMP_change",
+  "nodeNumber" : 10,
+  "subTree" : "(NP (NN climate) (NN variability))",
+  "subStr" : "climate variability"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:2:46:PCOMP_change",
+  "label" : "change",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 2,
+  "extractName" : "PCOMP_change",
+  "nodeNumber" : 46,
+  "subTree" : "(NP (JJ mean) (NN climate))",
+  "subStr" : "mean climate"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:3:28:NOM1_change",
+  "label" : "change",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 3,
+  "extractName" : "NOM1_change",
+  "nodeNumber" : 28,
+  "subTree" : "(NP (JJ human-induced) (NN climate))",
+  "subStr" : "human-induced climate"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:3:19:ATTR1_grow",
+  "label" : "increase",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 3,
+  "extractName" : "ATTR1_grow",
+  "nodeNumber" : 19,
+  "subTree" : "(NP (NN concern))",
+  "subStr" : "concern"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:4:78:ATTR1_change",
+  "label" : "change",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 4,
+  "extractName" : "ATTR1_change",
+  "nodeNumber" : 78,
+  "subTree" : "(NP (NN variability))",
+  "subStr" : "variability"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:4:60:PCOMP_shift",
+  "label" : "change",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 4,
+  "extractName" : "PCOMP_shift",
+  "nodeNumber" : 60,
+  "subTree" : "(NP (JJ mean) (NN climate))",
+  "subStr" : "mean climate"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:4:4:SUBJ_increase",
+  "label" : "increase",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 4,
+  "extractName" : "SUBJ_increase",
+  "nodeNumber" : 4,
+  "subTree" : "(NP (NP (JJ certain) (NNS type)) (PP (IN of) (NP (JJ extreme) (NN weather))))",
+  "subStr" : "certain type of extreme weather"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:6:84:OBJ_alter",
+  "label" : "change",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 6,
+  "extractName" : "OBJ_alter",
+  "nodeNumber" : 84,
+  "subTree" : "(NP (DT the) (JJ polar) (NN jet) (NN stream))",
+  "subStr" : "the polar jet stream"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:6:15:SUBJ_alter",
+  "label" : "change",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 6,
+  "extractName" : "SUBJ_alter",
+  "nodeNumber" : 15,
+  "subTree" : "(NP (NP (NNP Arctic) (NN amplification)) (PRN (: --) (NP (NP (DT the) (JJR greater) (NN warming)) (PP (IN of) (NP (DT the) (NNP Arctic))) (PP (VBN compare) (PP (IN with) (NP (NP (JJR lower) (NNS latitudes)) (VP (VBN associate) (PP (IN with) (S (VP (VBG diminish) (NP (NP (NN sea) (NN ice)) (CC and) (NP (NN snow) (NN cover))))))))))) (: --)))",
+  "subStr" : "Arctic amplification -- the greater warming of the Arctic compare with lower latitudes associate with diminish sea ice and snow cover --"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:6:98:NOM1_variability",
+  "label" : "change",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 6,
+  "extractName" : "NOM1_variability",
+  "nodeNumber" : 98,
+  "subTree" : "(NP (NN temperature))",
+  "subStr" : "temperature"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:6:98:OBJ_increase",
+  "label" : "increase",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 6,
+  "extractName" : "OBJ_increase",
+  "nodeNumber" : 98,
+  "subTree" : "(NP (NN temperature) (NN variability))",
+  "subStr" : "temperature variability"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:6:62:OBJ_diminish",
+  "label" : "decrease",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 6,
+  "extractName" : "OBJ_diminish",
+  "nodeNumber" : 62,
+  "subTree" : "(NP (NP (NN sea) (NN ice)) (CC and) (NP (NN snow) (NN cover)))",
+  "subStr" : "sea ice and snow cover"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:7:22:NOM1_variability",
+  "label" : "change",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 7,
+  "extractName" : "NOM1_variability",
+  "nodeNumber" : 22,
+  "subTree" : "(NP (JJ subseasonal) (NN cold-season) (NN temperature))",
+  "subStr" : "subseasonal cold-season temperature"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:7:22:SUBJ_decrease",
+  "label" : "decrease",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 7,
+  "extractName" : "SUBJ_decrease",
+  "nodeNumber" : 22,
+  "subTree" : "(NP (JJ subseasonal) (NN cold-season) (NN temperature) (NN variability))",
+  "subStr" : "subseasonal cold-season temperature variability"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:8:80:NOM1_variance",
+  "label" : "change",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 8,
+  "extractName" : "NOM1_variance",
+  "nodeNumber" : 80,
+  "subTree" : "(NP (JJ subseasonal) (NN temperature))",
+  "subStr" : "subseasonal temperature"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:8:80:OBJ_reduce",
+  "label" : "decrease",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 8,
+  "extractName" : "OBJ_reduce",
+  "nodeNumber" : 80,
+  "subTree" : "(NP (JJ subseasonal) (NN temperature) (NN variance))",
+  "subStr" : "subseasonal temperature variance"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:9:38:PCOMP_change",
+  "label" : "change",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 9,
+  "extractName" : "PCOMP_change",
+  "nodeNumber" : 38,
+  "subTree" : "(NP (NP (JJ atmospheric) (NN circulation)) (, ,) (SBAR (WHNP (WDT which)) (S (VP (VBP be) (ADJP (JJ hard) (S (VP (TO to) (VP (VP (VB detect) (PP (IN in) (NP (JJ present) (NNS observation)))) (CC and) (VP (ADJP (RB highly) (JJ uncertain)) (PP (IN in) (NP (DT the) (NN future))))))))))))",
+  "subStr" : "atmospheric circulation, which be hard to detect in present observation and highly uncertain in the future"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:9:20:ATTR1_increase",
+  "label" : "increase",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 9,
+  "extractName" : "ATTR1_increase",
+  "nodeNumber" : 20,
+  "subTree" : "(NP (NN weather) (NNS extreme))",
+  "subStr" : "weather extreme"
+}, {
+  "key" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse:10:18:NOM1_variability",
+  "label" : "change",
+  "filename" : "10.1038#nclimate2268#abs#sent#scnlp_v3.5.1.parse",
+  "treeNumber" : 10,
+  "extractName" : "NOM1_variability",
+  "nodeNumber" : 18,
+  "subTree" : "(NP (JJ subseasonal) (NN cold-season) (NN temperature))",
+  "subStr" : "subseasonal cold-season temperature"
+} ]
