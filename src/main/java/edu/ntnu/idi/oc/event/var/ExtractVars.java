@@ -1,6 +1,7 @@
 package edu.ntnu.idi.oc.event.var;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -31,6 +32,10 @@ public class ExtractVars {
         parser.addArgument("extraction")
                 .metavar("EXTRACT")
                 .help("directory for writing extractions in JSON format");
+        parser.addArgument("--resume")
+                .setDefault(false)
+                .action(Arguments.storeTrue())
+                .help("resume process");
 
         Namespace namespace = null;
         try {
@@ -53,8 +58,9 @@ public class ExtractVars {
 
         Path treesPath = Paths.get(namespace.getString("trees"));
         Path extractDir = Paths.get(namespace.getString("extraction"));
+        boolean resume = namespace.getBoolean("resume");
 
-        extraction.apply(treesPath, extractDir);
+        extraction.apply(treesPath, extractDir, resume);
     }
 
 }

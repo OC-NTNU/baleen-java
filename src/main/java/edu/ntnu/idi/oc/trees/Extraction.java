@@ -9,11 +9,13 @@ import edu.stanford.nlp.ling.Sentence;
 import edu.stanford.nlp.process.PTBTokenizer;
 import edu.stanford.nlp.trees.Tree;
 import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.xpath.operations.Bool;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -50,6 +52,10 @@ public class Extraction {
                 .nargs("+")
                 .metavar("LABEL:TRANS")
                 .help("pair of a label and file with transformations in named Tsurgeon format");
+        parser.addArgument("--resume")
+                .setDefault(false)
+                .action(Arguments.storeTrue())
+                .help("resume process");
 
         Namespace namespace = null;
         try {
@@ -68,8 +74,9 @@ public class Extraction {
 
         Path treesPath = Paths.get(namespace.getString("trees"));
         Path extractDir = Paths.get(namespace.getString("extraction"));
+        boolean resume = namespace.getBoolean("resume");
 
-        extraction.apply(treesPath, extractDir);
+        extraction.apply(treesPath, extractDir, resume);
     }
 
     public Extraction(List<TreeExtractor> extractors) {
@@ -90,26 +97,32 @@ public class Extraction {
         extractors.add(new TreeExtractor(label, stream));
     }
 
-    public void apply(Path treesPath, Path extractDir) {
+    public void apply(Path treesPath, Path extractDir, boolean resume) {
         try {
             FileUtils.forceMkdir(extractDir.toFile());
 
             Files.walk(treesPath)
                     .filter(Files::isRegularFile)
-                    .forEach(p -> extractFromFile(p, extractDir));
+                    .forEach(p -> extractFromFile(p, extractDir, resume));
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
         }
     }
 
 
-    private void extractFromFile(Path treeFile, Path extractDir) {
-        log.info(treeFile.toString());
-
+    private void extractFromFile(Path treeFile, Path extractDir, boolean resume) {
         // construct output filename
         Path extractFile = Paths.get(FilenameUtils.concat(
                 extractDir.toString(),
                 FilenameUtils.getBaseName(treeFile.toString()) + outFileTag + ".json"));
+
+        if (resume && Files.exists(extractFile)) {
+            log.info("skipping existing output file " + extractFile);
+            return;
+        }
+
+        log.info("reading trees from " + treeFile);
+        log.info("writing extracted variables to " + extractFile);
 
         try (BufferedReader reader = Files.newBufferedReader(treeFile);
              BufferedWriter writer = Files.newBufferedWriter(extractFile)) {

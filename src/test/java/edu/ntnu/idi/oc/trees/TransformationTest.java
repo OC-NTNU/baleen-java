@@ -23,7 +23,7 @@ public class TransformationTest {
         if (Files.exists(transDir)) {
             FileUtils.cleanDirectory(transDir.toFile());
         };
-        transformation.apply(varRecords, transDir,false);
+        transformation.apply(varRecords, transDir, true);
 
         assert Files.exists(transDir);
 

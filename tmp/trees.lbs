@@ -1,2 +1,0 @@
-(ROOT (S (NP (NNS bubble)) (VP (VBP prompt) (NP (JJ climate-change) (NN rethink)))))
-(ROOT (S (NP (NNP Argon) (NNS trace)) (VP (VBP hint) (SBAR (IN that) (S (NP (NN carbon) (NN dioxide)) (VP (VP (VBD do) (RB not) (VP (VB lead) (NP (NN life)) (ADVP (IN out) (PP (IN of) (NP (DT the) (NN freezer)))))) (, ,) (CC but) (VP (VBD follow)))))) (. .)))

@@ -25,7 +25,7 @@ public class ExtractionTest {
         }
         Path treesPath = Paths.get("src/test/resources/trees");
 
-        extraction.apply(treesPath, extractDir);
+        extraction.apply(treesPath, extractDir, false);
 
         assert Files.exists(extractDir);
 

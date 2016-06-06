@@ -43,6 +43,10 @@ public class PruneVars {
                 .metavar("N")
                 .type(Integer.class)
                 .help(String.format("skip trees with more than N nodes (default %d)", DEFAULT_MAX_TREE_SIZE));
+        parser.addArgument("--resume")
+                .setDefault(false)
+                .action(Arguments.storeTrue())
+                .help("resume process");
 
 
         Namespace namespace = null;
@@ -66,8 +70,9 @@ public class PruneVars {
         Path transDir = Paths.get(namespace.getString("transDir"));
         Boolean unique = namespace.getBoolean("unique");
         int maxTreeSize = namespace.getInt("max_tree_size");
+        boolean resume = namespace.getBoolean("resume");
 
-        transformation.apply(varsPath, transDir, unique, maxTreeSize);
+        transformation.apply(varsPath, transDir, unique, maxTreeSize, resume);
     }
 
 }

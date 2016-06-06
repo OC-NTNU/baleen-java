@@ -37,6 +37,7 @@ public class Transformation {
     private JsonFactory factory;
     private final List<TreeTransformer> transformers;
     private final static int DEFAULT_MAX_TREE_SIZE = 100;
+    private final static boolean DEFAULT_RESUME = false;
     private final String outFileTag = "#trans";
 
     private static Logger log = Logger.getLogger("Transformation");
@@ -64,6 +65,10 @@ public class Transformation {
                 .metavar("N")
                 .type(Integer.class)
                 .help(String.format("skip trees with more than N nodes (default %d)", DEFAULT_MAX_TREE_SIZE));
+        parser.addArgument("--resume")
+                .setDefault(false)
+                .action(Arguments.storeTrue())
+                .help("resume process");
 
         Namespace namespace = null;
         try {
@@ -83,8 +88,9 @@ public class Transformation {
         Path transDir = Paths.get(namespace.getString("transDir"));
         Boolean unique = namespace.getBoolean("unique");
         int maxTreeSize = namespace.getInt("max_tree_size");
+        boolean resume = namespace.getBoolean("resume");
 
-        transformation.apply(varsPath, transDir, unique, maxTreeSize);
+        transformation.apply(varsPath, transDir, unique, maxTreeSize, resume);
     }
 
 
@@ -110,20 +116,21 @@ public class Transformation {
     apply(Path varsPath,
           Path transDir,
           boolean unique) {
-        apply(varsPath, transDir, unique, DEFAULT_MAX_TREE_SIZE);
+        apply(varsPath, transDir, unique, DEFAULT_MAX_TREE_SIZE, DEFAULT_RESUME);
     }
 
     public void
     apply(Path varsPath,
           Path transDir,
           boolean unique,
-          int maxTreeSize) {
+          int maxTreeSize,
+          boolean resume) {
         try {
             FileUtils.forceMkdir(transDir.toFile());
 
             Files.walk(varsPath)
                     .filter(Files::isRegularFile)
-                    .forEach(p -> transformFile(p, transDir, unique, maxTreeSize));
+                    .forEach(p -> transformFile(p, transDir, unique, maxTreeSize, resume));
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
         }
@@ -133,11 +140,17 @@ public class Transformation {
     transformFile(Path varFile,
                   Path transDir,
                   boolean unique,
-                  int maxTreeSize) {
+                  int maxTreeSize,
+                  boolean resume) {
         // construct output filename
         Path transFile = Paths.get(FilenameUtils.concat(
                 transDir.toString(),
                 FilenameUtils.getBaseName(varFile.toString()) + outFileTag + ".json"));
+
+        if (resume && Files.exists(transFile)) {
+            log.info("skipping existing output file " + transFile);
+            return;
+        }
 
         log.info("reading variables from " + varFile);
         log.info("writing transformed variables to " + transFile);
