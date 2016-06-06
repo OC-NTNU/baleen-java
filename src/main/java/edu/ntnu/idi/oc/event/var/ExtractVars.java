@@ -22,6 +22,7 @@ public class ExtractVars {
             "decrease:tsurgeon/extract/decrease.tfm",
             "increase:tsurgeon/extract/increase.tfm"
     };
+    private final static String DEFAULT_TAG = "#var";
 
     public static void main(String[] args) throws IOException {
         ArgumentParser parser = ArgumentParsers.newArgumentParser("extract-vars")
@@ -32,10 +33,14 @@ public class ExtractVars {
         parser.addArgument("extraction")
                 .metavar("EXTRACT")
                 .help("directory for writing extractions in JSON format");
-        parser.addArgument("--resume")
+        parser.addArgument("-r", "--resume")
                 .setDefault(false)
                 .action(Arguments.storeTrue())
                 .help("resume process");
+        parser.addArgument("-t", "--tag")
+                .setDefault(DEFAULT_TAG)
+                .help("filename tag (default '" + DEFAULT_TAG + "')" );
+
 
         Namespace namespace = null;
         try {
@@ -59,8 +64,9 @@ public class ExtractVars {
         Path treesPath = Paths.get(namespace.getString("trees"));
         Path extractDir = Paths.get(namespace.getString("extraction"));
         boolean resume = namespace.getBoolean("resume");
+        String tag = namespace.getString("tag");
 
-        extraction.apply(treesPath, extractDir, resume);
+        extraction.apply(treesPath, extractDir, resume, tag);
     }
 
 }

@@ -38,7 +38,7 @@ public class Transformation {
     private final List<TreeTransformer> transformers;
     private final static int DEFAULT_MAX_TREE_SIZE = 100;
     private final static boolean DEFAULT_RESUME = false;
-    private final String outFileTag = "#trans";
+    private final static String DEFAULT_TAG = "#trans";
 
     private static Logger log = Logger.getLogger("Transformation");
 
@@ -56,19 +56,22 @@ public class Transformation {
                 .nargs("+")
                 .metavar("TRANS")
                 .help("operations file in Transformer format");
-        parser.addArgument("--unique")
+        parser.addArgument("-u", "--unique")
                 .setDefault(false)
                 .action(Arguments.storeTrue())
                 .help("unique substrings (ommit duplicate results)");
-        parser.addArgument("--max-tree-size")
+        parser.addArgument("-m", "--max-tree-size")
                 .setDefault(DEFAULT_MAX_TREE_SIZE)
                 .metavar("N")
                 .type(Integer.class)
                 .help(String.format("skip trees with more than N nodes (default %d)", DEFAULT_MAX_TREE_SIZE));
-        parser.addArgument("--resume")
+        parser.addArgument("-r", "--resume")
                 .setDefault(false)
                 .action(Arguments.storeTrue())
                 .help("resume process");
+        parser.addArgument("-t", "--tag")
+                .setDefault(DEFAULT_TAG)
+                .help("filename tag (default '" + DEFAULT_TAG + "')" );
 
         Namespace namespace = null;
         try {
@@ -89,8 +92,9 @@ public class Transformation {
         Boolean unique = namespace.getBoolean("unique");
         int maxTreeSize = namespace.getInt("max_tree_size");
         boolean resume = namespace.getBoolean("resume");
+        String tag = namespace.getString("tag");
 
-        transformation.apply(varsPath, transDir, unique, maxTreeSize, resume);
+        transformation.apply(varsPath, transDir, unique, maxTreeSize, resume, tag);
     }
 
 
@@ -116,7 +120,7 @@ public class Transformation {
     apply(Path varsPath,
           Path transDir,
           boolean unique) {
-        apply(varsPath, transDir, unique, DEFAULT_MAX_TREE_SIZE, DEFAULT_RESUME);
+        apply(varsPath, transDir, unique, DEFAULT_MAX_TREE_SIZE, DEFAULT_RESUME, DEFAULT_TAG);
     }
 
     public void
@@ -124,13 +128,14 @@ public class Transformation {
           Path transDir,
           boolean unique,
           int maxTreeSize,
-          boolean resume) {
+          boolean resume,
+          String tag) {
         try {
             FileUtils.forceMkdir(transDir.toFile());
 
             Files.walk(varsPath)
                     .filter(Files::isRegularFile)
-                    .forEach(p -> transformFile(p, transDir, unique, maxTreeSize, resume));
+                    .forEach(p -> transformFile(p, transDir, unique, maxTreeSize, resume, tag));
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
         }
@@ -141,11 +146,12 @@ public class Transformation {
                   Path transDir,
                   boolean unique,
                   int maxTreeSize,
-                  boolean resume) {
+                  boolean resume,
+                  String tag) {
         // construct output filename
         Path transFile = Paths.get(FilenameUtils.concat(
                 transDir.toString(),
-                FilenameUtils.getBaseName(varFile.toString()) + outFileTag + ".json"));
+                FilenameUtils.getBaseName(varFile.toString()) + tag + ".json"));
 
         if (resume && Files.exists(transFile)) {
             log.info("skipping existing output file " + transFile);

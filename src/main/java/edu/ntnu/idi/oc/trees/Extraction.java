@@ -34,7 +34,8 @@ public class Extraction {
     ObjectMapper mapper = new ObjectMapper();
     private JsonGenerator generator;
     private JsonFactory factory;
-    private final String outFileTag = "#var";
+    private final static boolean DEFAULT_RESUME = false;
+    private final static String DEFAULT_TAG = "#var";
 
 
     private static Logger log = Logger.getLogger("Extraction");
@@ -52,10 +53,13 @@ public class Extraction {
                 .nargs("+")
                 .metavar("LABEL:TRANS")
                 .help("pair of a label and file with transformations in named Tsurgeon format");
-        parser.addArgument("--resume")
+        parser.addArgument("-r", "--resume")
                 .setDefault(false)
                 .action(Arguments.storeTrue())
                 .help("resume process");
+        parser.addArgument("-t", "--tag")
+                .setDefault(DEFAULT_TAG)
+                .help("filename tag (default '" + DEFAULT_TAG + "')" );
 
         Namespace namespace = null;
         try {
@@ -75,8 +79,9 @@ public class Extraction {
         Path treesPath = Paths.get(namespace.getString("trees"));
         Path extractDir = Paths.get(namespace.getString("extraction"));
         boolean resume = namespace.getBoolean("resume");
+        String tag = namespace.getString("tag");
 
-        extraction.apply(treesPath, extractDir, resume);
+        extraction.apply(treesPath, extractDir, resume, tag);
     }
 
     public Extraction(List<TreeExtractor> extractors) {
@@ -97,24 +102,27 @@ public class Extraction {
         extractors.add(new TreeExtractor(label, stream));
     }
 
-    public void apply(Path treesPath, Path extractDir, boolean resume) {
+    public void apply(Path treesPath, Path extractDir, boolean resume, String tag) {
         try {
             FileUtils.forceMkdir(extractDir.toFile());
 
             Files.walk(treesPath)
                     .filter(Files::isRegularFile)
-                    .forEach(p -> extractFromFile(p, extractDir, resume));
+                    .forEach(p -> extractFromFile(p, extractDir, resume, tag));
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
         }
     }
 
+    public void apply(Path treesPath, Path extractDir) {
+        apply(treesPath, extractDir, DEFAULT_RESUME, DEFAULT_TAG);
+    }
 
-    private void extractFromFile(Path treeFile, Path extractDir, boolean resume) {
+    private void extractFromFile(Path treeFile, Path extractDir, boolean resume, String tag) {
         // construct output filename
         Path extractFile = Paths.get(FilenameUtils.concat(
                 extractDir.toString(),
-                FilenameUtils.getBaseName(treeFile.toString()) + outFileTag + ".json"));
+                FilenameUtils.getBaseName(treeFile.toString()) + tag + ".json"));
 
         if (resume && Files.exists(extractFile)) {
             log.info("skipping existing output file " + extractFile);

@@ -24,6 +24,7 @@ public class PruneVars {
             "tsurgeon/prune/modifiers.tfm",
     };
     private final static int DEFAULT_MAX_TREE_SIZE = 100;
+    private final static String DEFAULT_TAG = "#prune";
 
     public static void main(String[] args) throws IOException {
         ArgumentParser parser = ArgumentParsers.newArgumentParser("prune-vars")
@@ -34,19 +35,22 @@ public class PruneVars {
         parser.addArgument("transDir")
                 .metavar("OUT")
                 .help("directory for writing extracted variables JSON format");
-        parser.addArgument("--unique")
+        parser.addArgument("-u", "--unique")
                 .setDefault(false)
                 .action(Arguments.storeTrue())
                 .help("unique substrings (ommit duplicate results)");
-        parser.addArgument("--max-tree-size")
+        parser.addArgument("-m", "--max-tree-size")
                 .setDefault(DEFAULT_MAX_TREE_SIZE)
                 .metavar("N")
                 .type(Integer.class)
                 .help(String.format("skip trees with more than N nodes (default %d)", DEFAULT_MAX_TREE_SIZE));
-        parser.addArgument("--resume")
+        parser.addArgument("-r", "--resume")
                 .setDefault(false)
                 .action(Arguments.storeTrue())
                 .help("resume process");
+        parser.addArgument("-t", "--tag")
+                .setDefault(DEFAULT_TAG)
+                .help("filename tag (default '" + DEFAULT_TAG + "')" );
 
 
         Namespace namespace = null;
@@ -71,8 +75,9 @@ public class PruneVars {
         Boolean unique = namespace.getBoolean("unique");
         int maxTreeSize = namespace.getInt("max_tree_size");
         boolean resume = namespace.getBoolean("resume");
+        String tag = namespace.getString("tag");
 
-        transformation.apply(varsPath, transDir, unique, maxTreeSize, resume);
+        transformation.apply(varsPath, transDir, unique, maxTreeSize, resume, tag);
     }
 
 }
