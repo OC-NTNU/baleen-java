@@ -301,7 +301,7 @@ __ <-4 !CC|DT
    <-1 !~cat 
    !< /^,/
    
-delete cat cc
+prune cat cc
 
 
 %=============================================================================
@@ -328,7 +328,7 @@ $ Coordination CONJP 2.1a $
 /.+P$/=conj1 $+ (/^\W+/=punc $+ ((CONJP=conjp !<< rather|not ) 
                                              $+ /.+P$/=conj2))
    
-delete punc conjp conj2 
+prune punc conjp conj2
 
 %-----------------------------------------------------------------------------
 $ Coordination CONJP 2.1b $
@@ -350,7 +350,7 @@ $ Coordination CONJP 2.1b $
 /.+P$/=conj1 $+ ((CONJP=conjp !<< rather|not ) 
                               $+ /.+P$/=conj2)
    
-delete conjp conj2
+prune conjp conj2
 
 %-----------------------------------------------------------------------------
 $ Coordination CONJP 2.1c $
@@ -375,7 +375,7 @@ $ Coordination CONJP 2.1c $
 /.+P$/=conj1 $+ (/^\W+/=punc $+ ((CONJP=conjp << rather|not ) 
                                              $+ /.+P$/=conj2))
    
-delete punc conjp conj2 
+prune punc conjp conj2
 
 %-----------------------------------------------------------------------------
 $ Coordination CONJP 2.2a $
@@ -386,7 +386,7 @@ $ Coordination CONJP 2.2a $
 /.+P$/=conj1 $+ (/^\W+/=punc $+ ((CONJP=conjp !<< rather|not ) 
                                              $+ /.+P$/=conj2))
    
-delete conj1 punc conjp 
+prune conj1 punc conjp
 
 %-----------------------------------------------------------------------------
 $ Coordination CONJP 2.2b $
@@ -397,5 +397,5 @@ $ Coordination CONJP 2.2b $
 /.+P$/=conj1 $+ ((CONJP=conjp !<< rather|not ) 
                               $+ /.+P$/=conj2)
    
-delete conj1 conjp
+prune conj1 conjp
 

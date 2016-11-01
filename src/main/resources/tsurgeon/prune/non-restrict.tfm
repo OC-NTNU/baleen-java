@@ -23,7 +23,7 @@ $ Non-restrictive Clause Strip $
 
 /^,/=punc $. SBAR=sent
 
-delete punc sent
+prune punc sent
 
 
 %-----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ $ Non-restrictive Modifier Strip 1 $
 
 /.*P/=xp > NP $, /^,/=punc1 $. /^,/=punc2 !$ CC
 
-delete punc1 xp punc2
+prune punc1 xp punc2
 
 %-----------------------------------------------------------------------------
 $ Non-restrictive Modifier Strip 2 $
@@ -56,5 +56,5 @@ $ Non-restrictive Modifier Strip 2 $
 
 /.*P/=xp > NP $, /^,/=punc !$. /^,/ !$ CC
 
-delete punc xp
+prune punc xp
 

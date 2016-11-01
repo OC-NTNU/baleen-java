@@ -31,7 +31,7 @@ $ Strip PP $
 
 PP=pp !<< PP !$ CC|CONJP
 
-delete pp
+prune pp
 
 
 %=============================================================================
@@ -61,7 +61,7 @@ $ Strip SBAR $
 
 SBAR=sbar !<< SBAR !$ CC|CONJP !$, /^\W+/
 
-delete sbar
+prune sbar
 
 
 %=============================================================================
@@ -85,4 +85,4 @@ $ Strip Premodifier $
 
 NP <1 __=premod <# __=head !<1 =head !< CC|CONJP
 
-delete premod
+prune premod

@@ -211,11 +211,13 @@ public class Transformation {
             throws IOException {
         Tree tree = Tree.valueOf(ancestorNode.get("subTree").asText());
 
+        /*
         if (tree == null) {
             // transformation resulted in ill-formed tree, e.g. "NP"
             log.warning("skipping ill-formed tree: " + ancestorNode);
             return;
         }
+        */
 
         if (tree.size() > maxTreeSize) {
             log.warning(String.format("skipping tree because its size (%d nodes) exceeds max tree size (%d nodes)",
@@ -235,6 +237,13 @@ public class Transformation {
         for (TreeTransformer transformer : transformers) {
             for (Transform transform : transformer.transformTree(tree)) {
                 subStr = PTBTokenizer.ptb2Text(Sentence.listToString(transform.subTree.yield()));
+
+                // TODO: quick hack, needs to be resolved properly
+                if (Tree.valueOf(transform.subTree.toString()) == null) {
+                    // transformation resulted in ill-formed tree, e.g. "NP"
+                    log.warning("skipping ill-formed tree: " + transform.subTree.toString());
+                    continue;
+                }
 
                 if (seen != null) {
                     if (seen.contains(subStr)) {

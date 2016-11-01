@@ -39,7 +39,7 @@ $ Parenthetical Strip 2.1 $
 
 NP < ( -LRB-=x1 $. (__=x2 $. -RRB-=x3 ))
 
-delete x1 x2 x3
+prune x1 x2 x3
 
 %-----------------------------------------------------------------------------
 $ Parenthetical Strip 2.2 $
@@ -53,7 +53,7 @@ $ Parenthetical Strip 2.2 $
 
 NP < ( -LRB-=x1 $. ( __=x2 $. ( __=x3 $. -RRB-=x4)))
 
-delete x1 x2 x3 x4
+prune x1 x2 x3 x4
 
 
 %-----------------------------------------------------------------------------
@@ -66,7 +66,7 @@ $ Parenthetical Strip 2.3 $
 
 NP < ( -LRB-=x1 $. ( __=x2 $. ( __=x3 $. ( __=x4 $. -RRB-=x5))))
 
-delete x1 x2 x3 x4 x5
+prune x1 x2 x3 x4 x5
 
 
 %-----------------------------------------------------------------------------
@@ -81,7 +81,7 @@ $ List Strip $
 
 LST=lst
 
-delete lst
+prune lst
 
 
 
